@@ -6,6 +6,7 @@ import 'login_screen.dart';
 import 'trainers_list_screen.dart';
 import '../widgets/gym_card.dart'; // Asegúrate de tener este archivo creado
 
+// Pantalla principal del dashboard con lista de gimnasios
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -14,7 +15,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  // Estado para los filtros
+  // Estado para filtros de categorías
   String _activeFilter = "Todos";
   final List<String> _categories = [
     "Todos",
@@ -24,7 +25,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     "Estudio",
   ];
 
-  // Datos de ejemplo (Mock Data)
+  // Datos mock de gimnasios
   final List<Gym> _allGyms = [
     Gym(
       name: "Iron Temple Gym",
@@ -52,6 +53,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ),
   ];
 
+  // Función para abrir el mapa con gimnasios filtrados
   void _openGoogleMaps() {
     // Obtener lista filtrada de gimnasios
     final filteredGyms = _activeFilter == "Todos"
@@ -64,6 +66,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       MaterialPageRoute(
         builder: (context) => MapScreen(gyms: filteredGyms),
       ),
+    );
+  }
+
+  // Función para abrir el diálogo de notificaciones
+  void _openNotifications(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => const NotificationsViewDialog(),
     );
   }
 
@@ -84,11 +94,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top row: logout button
+            // Top row: notificaciones y botón de logout
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
               child: Row(
                 children: [
+                  IconButton(
+                    onPressed: () => _openNotifications(context),
+                    icon: const Icon(Icons.notifications, color: Color(0xFF4F46E5)),
+                    tooltip: 'Notificaciones',
+                  ),
                   const Spacer(),
                   IconButton(
                     onPressed: () async {
@@ -202,8 +217,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     height: 48,
                     child: ElevatedButton.icon(
                       onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TrainersListScreen())),
-                      icon: const Icon(Icons.group, size: 18, color: Colors.black),
-                      label: Text('Entrenadores', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w900, color: Colors.black)),
+                      icon: const Icon(Icons.group, size: 18, color: Color.fromARGB(255, 255, 255, 255)),
+                      label: Text('Entrenadores', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w900, color: const Color.fromARGB(255, 255, 255, 255))),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4F46E5),
                         foregroundColor: Colors.black,
@@ -278,8 +293,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   return GymCard(
                     gym: filteredGyms[index],
                     onTap: () {
-                      // Acción al tocar la tarjeta
-                      print("Seleccionado: ${filteredGyms[index].name}");
+                      // Acción al tocar la tarjeta (simulada, no hace nada)
                     },
                   );
                 },
@@ -288,6 +302,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// Diálogo para ver notificaciones
+class NotificationsViewDialog extends StatelessWidget {
+  const NotificationsViewDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Datos mock de notificaciones
+    final notifications = [
+      {'title': 'Nueva rutina disponible', 'message': 'Descubre la rutina de fuerza avanzada', 'time': 'Hace 2 horas'},
+      {'title': 'Cita confirmada', 'message': 'Tu cita con el entrenador está programada para mañana', 'time': 'Hace 5 horas'},
+      {'title': 'Actualización de app', 'message': 'Nueva versión disponible con mejoras', 'time': 'Hace 1 día'},
+      {'title': 'Recordatorio', 'message': 'No olvides completar tu rutina de hoy', 'time': 'Hace 2 días'},
+    ];
+
+    return AlertDialog(
+      title: const Text('Notificaciones'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: notifications.length,
+          itemBuilder: (context, index) {
+            final notif = notifications[index];
+            return ListTile(
+              leading: const Icon(Icons.notifications, color: Color(0xFF4F46E5)),
+              title: Text(notif['title']!),
+              subtitle: Text(notif['message']!),
+              trailing: Text(notif['time']!, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              onTap: () {
+                // Acción al tocar notificación (simulada)
+                Navigator.of(context).pop();
+              },
+            );
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cerrar'),
+        ),
+      ],
     );
   }
 }

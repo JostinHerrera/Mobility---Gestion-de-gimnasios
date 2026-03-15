@@ -254,7 +254,7 @@ class ChatListScreen extends StatelessWidget {
                             bottom: -2,
                             child: CircleAvatar(
                               radius: 8,
-                              backgroundColor: Colors.white,
+                              backgroundColor: Color.fromARGB(255, 255, 255, 255),
                               child: CircleAvatar(
                                 radius: 6,
                                 backgroundColor: Color(0xFF34D399),

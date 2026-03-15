@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../models/chat_models.dart';
+import 'chat_screen.dart';
 
+// Clase que representa los datos de un entrenador
 class Trainer {
   final String name;
   final String title;
@@ -10,13 +13,69 @@ class Trainer {
   final String clients;
   final String languages;
   final String about;
+  final String imageUrl; // URL de la imagen de perfil
 
-  const Trainer({required this.name, required this.title, required this.rating, required this.years, required this.certifications, required this.clients, required this.languages, required this.about});
+  const Trainer({required this.name, required this.title, required this.rating, required this.years, required this.certifications, required this.clients, required this.languages, required this.about, required this.imageUrl});
 }
 
-class TrainerScreen extends StatelessWidget {
+// Pantalla que muestra los detalles de un entrenador
+class TrainerScreen extends StatefulWidget {
   final Trainer trainer;
   const TrainerScreen({required this.trainer, super.key});
+
+  @override
+  State<TrainerScreen> createState() => _TrainerScreenState();
+}
+
+class _TrainerScreenState extends State<TrainerScreen> {
+  // Función que muestra el diálogo de contacto con opciones para llamar o enviar mensaje
+  void _showContactDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Contactar al Entrenador'),
+        content: const Text('¿Cómo deseas contactar al entrenador?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Llamando al entrenador...')),
+              );
+            },
+            child: const Text('Llamar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              // Crear un chat simulado para el entrenador
+              final mockChat = Chat(
+                name: widget.trainer.name,
+                avatarUrl: widget.trainer.imageUrl, // Usar la imagen del entrenador
+                lastMessage: 'Hola, ¿en qué puedo ayudarte?',
+                lastMessageTime: DateTime.now(),
+                messages: [
+                  Message(
+                    text: 'Hola, soy ${widget.trainer.name}. ¿En qué puedo ayudarte?',
+                    isMine: false,
+                    time: DateTime.now().subtract(const Duration(minutes: 5)),
+                  ),
+                ],
+                isOnline: true,
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChatScreen(chat: mockChat),
+                ),
+              );
+            },
+            child: const Text('Enviar Mensaje'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +87,7 @@ class TrainerScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
-        title: Text(trainer.name, style: textTheme.titleLarge?.copyWith(color: const Color(0xFF0F172A), fontWeight: FontWeight.w900)),
+        title: Text(widget.trainer.name, style: textTheme.titleLarge?.copyWith(color: const Color(0xFF0F172A), fontWeight: FontWeight.w900)),
       ),
       backgroundColor: const Color(0xFFF8FAFF),
       body: SingleChildScrollView(
@@ -36,7 +95,7 @@ class TrainerScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // Header con información básica del entrenador
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(18),
@@ -47,24 +106,27 @@ class TrainerScreen extends StatelessWidget {
                     width: 82,
                     height: 82,
                     decoration: BoxDecoration(color: const Color(0xFFF3F4FF), borderRadius: BorderRadius.circular(14)),
-                    child: const Icon(Icons.person, size: 46, color: primary),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Image.network(widget.trainer.imageUrl, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.person, size: 46, color: primary)),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(trainer.name, style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                        Text(widget.trainer.name, style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
                         const SizedBox(height: 6),
-                        Text(trainer.title, style: textTheme.bodyMedium?.copyWith(color: Colors.grey[700])),
+                        Text(widget.trainer.title, style: textTheme.bodyMedium?.copyWith(color: Colors.grey[700])),
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            _starRow(trainer.rating),
+                            _starRow(widget.trainer.rating),
                             const SizedBox(width: 8),
-                            Text('${trainer.rating}', style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                            Text('${widget.trainer.rating}', style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
                             const SizedBox(width: 8),
-                            Text('· ${trainer.years} años experiencia', style: textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                            Text('· ${widget.trainer.years} años experiencia', style: textTheme.bodySmall?.copyWith(color: Colors.grey)),
                           ],
                         )
                       ],
@@ -76,54 +138,44 @@ class TrainerScreen extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            // Quick info
+            // Información rápida en chips
             Row(
               children: [
-                _infoChip('Certificaciones', '${trainer.certifications}', primary),
+                _infoChip('Certificación', '${widget.trainer.certifications}', primary),
                 const SizedBox(width: 8),
-                _infoChip('Clientes', trainer.clients, Colors.teal),
+                _infoChip('Clientes', widget.trainer.clients, Colors.teal),
                 const SizedBox(width: 8),
-                _infoChip('Idiomas', trainer.languages, Colors.orange),
+                _infoChip('Idiomas', widget.trainer.languages, Colors.orange),
               ],
             ),
 
             const SizedBox(height: 18),
 
-            // Contact actions
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: const Text('Mensaje'),
-                    style: ElevatedButton.styleFrom(backgroundColor: primary),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.calendar_today),
-                  label: const Text('Reservar'),
-                ),
-              ],
+            // Botón para reservar cita
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _showContactDialog(context),
+                icon: const Icon(Icons.calendar_today),
+                label: const Text('Reservar'),
+              ),
             ),
 
             const SizedBox(height: 18),
 
-            // About
+            // Sección sobre el entrenador
             Text('Sobre el entrenador', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900)),
             const SizedBox(height: 8),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-              child: Text(trainer.about, style: textTheme.bodyMedium),
+              child: Text(widget.trainer.about, style: textTheme.bodyMedium),
             ),
 
             const SizedBox(height: 18),
 
-            // Programs
+            // Programas destacados
             Text('Programas destacados', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900)),
             const SizedBox(height: 8),
             _programCard('Fuerza 12 semanas', 'Programa progresivo para ganar fuerza y masa muscular.'),
@@ -131,7 +183,7 @@ class TrainerScreen extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            // Schedule / Reviews placeholders
+            // Reseñas (placeholder)
             Text('Reseñas', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900)),
             const SizedBox(height: 8),
             Container(
@@ -153,10 +205,12 @@ class TrainerScreen extends StatelessWidget {
   }
 }
 
+// Función que crea una fila de estrellas (hardcoded a 5 estrellas completas)
 Widget _starRow(double value) {
   return Row(children: const [Icon(Icons.star, color: Color(0xFFFFD54F), size: 16), Icon(Icons.star, color: Color(0xFFFFD54F), size: 16), Icon(Icons.star, color: Color(0xFFFFD54F), size: 16), Icon(Icons.star, color: Color(0xFFFFD54F), size: 16), Icon(Icons.star_half, color: Color(0xFFFFD54F), size: 16)]);
 }
 
+// Widget que crea un chip de información con icono, etiqueta y valor
 Widget _infoChip(String label, String value, Color color) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -169,6 +223,7 @@ Widget _infoChip(String label, String value, Color color) {
   );
 }
 
+// Widget que crea una tarjeta para un programa con título, subtítulo y botón
 Widget _programCard(String title, String subtitle) {
   return Container(
     width: double.infinity,
