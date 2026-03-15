@@ -82,7 +82,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Text(
-                        "Tu compañero integral para alcanzar tus objetivos físicos.",
+                        "Entrena, mejora y supera tus límites con \nMobility GYM",
                         textAlign: TextAlign.center,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 18,

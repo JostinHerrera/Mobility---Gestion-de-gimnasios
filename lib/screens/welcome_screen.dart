@@ -31,7 +31,7 @@ class WelcomeScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             const Text(
-              "Tu compañero integral para alcanzar tus objetivos físicos.",
+              "Entrena, mejora y supera tus límites con Mobility GYM",
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white70),
             ),

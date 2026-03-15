@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'map_screen.dart';
 import 'login_screen.dart';
 import 'trainers_list_screen.dart';
-import '../widgets/gym_card.dart'; // Asegúrate de tener este archivo creado
+import '../widgets/gym_card.dart'; 
 
 // Pantalla principal del dashboard con lista de gimnasios
 class DashboardScreen extends StatefulWidget {
