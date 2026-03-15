@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'map_screen.dart';
+import 'login_screen.dart';
+import 'trainers_list_screen.dart';
 import '../widgets/gym_card.dart'; // Asegúrate de tener este archivo creado
 
 class DashboardScreen extends StatefulWidget {
@@ -82,6 +84,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Top row: logout button
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+              child: Row(
+                children: [
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Cerrar sesión'),
+                          content: const Text('¿Estás seguro que deseas cerrar sesión?'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+                            TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Cerrar sesión')),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true) {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                      }
+                    },
+                    icon: const Icon(Icons.logout, color: Color(0xFF4F46E5)),
+                    tooltip: 'Cerrar sesión',
+                  ),
+                ],
+              ),
+            ),
             // 1. HEADER Y BUSCADOR
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
@@ -107,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
+                          color: Colors.black.withAlpha(8),
                           blurRadius: 15,
                           offset: const Offset(0, 5),
                         ),
@@ -134,33 +165,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            // 2. BOTÓN PARA ABRIR MAPA
+            // 2. BOTÓN PARA ABRIR MAPA y botón pequeño de Entrenadores al lado
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: ElevatedButton(
-                onPressed: _openGoogleMaps,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(LucideIcons.map, color: Colors.white, size: 16),
-                    SizedBox(width: 8),
-                    Text(
-                      'Ver Mapa',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _openGoogleMaps,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4F46E5),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(LucideIcons.map, color: Colors.white, size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            'Ver Mapa',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TrainersListScreen())),
+                      icon: const Icon(Icons.group, size: 18, color: Colors.black),
+                      label: Text('Entrenadores', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w900, color: Colors.black)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4F46E5),
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -191,7 +243,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         boxShadow: [
                           if (isActive)
                             BoxShadow(
-                              color: kPrimaryIndigo.withOpacity(0.2),
+                              color: kPrimaryIndigo.withAlpha(51),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),

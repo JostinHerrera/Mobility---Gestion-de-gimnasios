@@ -4,9 +4,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'login_screen.dart';    // Asegúrate de tener estos archivos creados
 import 'register_screen.dart'; // en tu carpeta lib/screens/
 
-class LandingScreen extends StatelessWidget {
+class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
 
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     // Definición de colores del diseño original
@@ -36,7 +41,7 @@ class LandingScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(48), // 3rem
                         boxShadow: [
                           BoxShadow(
-                            color: kPrimaryIndigo.withOpacity(0.25),
+                            color: kPrimaryIndigo.withAlpha(64),
                             blurRadius: 40,
                             offset: const Offset(0, 20),
                           )
@@ -94,6 +99,7 @@ class LandingScreen extends StatelessWidget {
               // 2. SECCIÓN INFERIOR: BOTONES (rounded-[2rem])
               Column(
                 children: [
+                  
                   // BOTÓN: Empezar Ahora (Indigo)
                   SizedBox(
                     width: double.infinity,
@@ -109,7 +115,7 @@ class LandingScreen extends StatelessWidget {
                         backgroundColor: kPrimaryIndigo,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        shadowColor: kPrimaryIndigo.withOpacity(0.2),
+                        shadowColor: kPrimaryIndigo.withAlpha(51),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32), // 2rem
                         ),
