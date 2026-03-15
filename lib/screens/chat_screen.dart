@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 
+import '../models/chat_models.dart';
+
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final Chat chat;
+
+  const ChatScreen({super.key, required this.chat});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final List<String> _messages = [
-    'Hola, ¿en qué puedo ayudarte?',
-    'Quisiera información sobre rutinas.',
-  ];
+  late List<Message> _messages;
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _messages = List.from(widget.chat.messages);
+  }
 
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
+
     setState(() {
-      _messages.add(text);
+      _messages.add(Message(text: text, isMine: true, time: DateTime.now()));
     });
+
     _controller.clear();
   }
 
@@ -32,7 +41,24 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat')),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Expanded(child: Text(widget.chat.name)),
+            if (widget.chat.isOnline)
+              Row(
+                children: const [
+                  Icon(Icons.circle, color: Color(0xFF34D399), size: 10),
+                  SizedBox(width: 6),
+                  Text(
+                    'En línea',
+                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           // Contenedor de chat
@@ -57,24 +83,26 @@ class _ChatScreenState extends State<ChatScreen> {
                       itemCount: _messages.length,
                       itemBuilder: (context, index) {
                         final msg = _messages[index];
-                        final isMine = index == _messages.length - 1;
                         return Align(
-                          alignment:
-                              isMine ? Alignment.centerRight : Alignment.centerLeft,
+                          alignment: msg.isMine
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
                           child: Container(
                             margin: const EdgeInsets.symmetric(vertical: 6),
                             padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 14),
+                              vertical: 10,
+                              horizontal: 14,
+                            ),
                             decoration: BoxDecoration(
-                              color: isMine
+                              color: msg.isMine
                                   ? Theme.of(context).colorScheme.primary
                                   : Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              msg,
+                              msg.text,
                               style: TextStyle(
-                                color: isMine
+                                color: msg.isMine
                                     ? Colors.white
                                     : Colors.black87,
                               ),

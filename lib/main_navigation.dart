@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/dashboard_screen.dart'; // Inicio
-import 'screens/chat_screen.dart';
+import 'screens/chat_list_screen.dart';
 import 'screens/routines_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/login_screen.dart';
@@ -20,7 +20,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     RoutinesScreen(),
-    ChatScreen(),
+    ChatListScreen(),
     ProfileScreen(),
   ];
 
@@ -41,7 +41,14 @@ class _MainNavigationState extends State<MainNavigation> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text('Mobility_GYM', style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w800, color: const Color(0xFF4F46E5))),
+                child: Text(
+                  'Mobility_GYM',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF4F46E5),
+                  ),
+                ),
               ),
               const Divider(),
               ListTile(
@@ -84,26 +91,49 @@ class _MainNavigationState extends State<MainNavigation> {
               ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(color: const Color(0xFFFFF1F2), borderRadius: BorderRadius.circular(6)),
-                  child: const Icon(Icons.exit_to_app, color: Color(0xFFDC2626)),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF1F2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(
+                    Icons.exit_to_app,
+                    color: Color(0xFFDC2626),
+                  ),
                 ),
-                title: Text('Cerrar Sesión', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, color: const Color(0xFFDC2626))),
+                title: Text(
+                  'Cerrar Sesión',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFFDC2626),
+                  ),
+                ),
                 onTap: () async {
                   final confirmed = await showDialog<bool>(
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: const Text('Cerrar sesión'),
-                      content: const Text('¿Estás seguro que deseas cerrar sesión?'),
+                      content: const Text(
+                        '¿Estás seguro que deseas cerrar sesión?',
+                      ),
                       actions: [
-                        TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
-                        TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Cerrar sesión')),
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(false),
+                          child: const Text('Cancelar'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(true),
+                          child: const Text('Cerrar sesión'),
+                        ),
                       ],
                     ),
                   );
                   if (!mounted) return;
                   if (confirmed == true) {
                     // ignore: use_build_context_synchronously
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    );
                   }
                 },
               ),
@@ -124,7 +154,10 @@ class _MainNavigationState extends State<MainNavigation> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Inicio"),
-          BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: "Rutinas"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center),
+            label: "Rutinas",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Chat"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Perfil"),
         ],
