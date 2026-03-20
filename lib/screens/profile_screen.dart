@@ -6,13 +6,25 @@ import 'login_screen.dart';
 
 // Pantalla de perfil del usuario con configuración y datos físicos
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool openEditor;
+  final bool initialPublic;
+  const ProfileScreen({super.key, this.openEditor = false, this.initialPublic = true});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _publicProfile = widget.initialPublic;
+    if (widget.openEditor) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openEditPhysical(context);
+      });
+    }
+  }
   // Variables de estado para el perfil público y datos físicos
   bool _publicProfile = true;
   double weight = 75.0;

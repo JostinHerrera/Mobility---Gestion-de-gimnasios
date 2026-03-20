@@ -8,7 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class MainNavigation extends StatefulWidget {
   final int initialIndex;
-  const MainNavigation({super.key, this.initialIndex = 0});
+  final bool openProfileEditor;
+  final bool initialProfilePublic;
+  const MainNavigation({super.key, this.initialIndex = 0, this.openProfileEditor = false, this.initialProfilePublic = true});
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
@@ -17,12 +19,6 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   late int _currentIndex;
 
-  final List<Widget> _screens = const [
-    DashboardScreen(),
-    RoutinesScreen(),
-    ChatListScreen(),
-    ProfileScreen(),
-  ];
 
   @override
   void initState() {
@@ -32,8 +28,15 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> screens = [
+      const DashboardScreen(),
+      const RoutinesScreen(),
+      const ChatListScreen(),
+      ProfileScreen(openEditor: widget.openProfileEditor, initialPublic: widget.initialProfilePublic),
+    ];
+
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: screens[_currentIndex],
       drawer: Drawer(
         child: SafeArea(
           child: Column(

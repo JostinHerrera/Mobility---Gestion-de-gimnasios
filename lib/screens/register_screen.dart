@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'login_screen.dart';
+import '../main_navigation.dart';
+import 'profile_setup_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -94,7 +96,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               height: 65,
               child: ElevatedButton(
                 onPressed: () {
-                  // Lógica de registro
+                  // Aquí iría la lógica real de registro (validación, API, etc.)
+                  // Por ahora navegamos directamente al perfil como se solicitó.
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileSetupScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kPrimaryIndigo,

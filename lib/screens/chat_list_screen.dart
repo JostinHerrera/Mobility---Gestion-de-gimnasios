@@ -4,9 +4,9 @@ import '../models/chat_models.dart';
 import 'chat_screen.dart';
 import '../main_navigation.dart';
 
+// Pantalla de lista de chats
 class ChatListScreen extends StatelessWidget {
   const ChatListScreen({super.key});
-
   static final List<Story> _stories = [
     const Story(
       name: 'Cristian',
@@ -254,7 +254,12 @@ class ChatListScreen extends StatelessWidget {
                             bottom: -2,
                             child: CircleAvatar(
                               radius: 8,
-                              backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                              backgroundColor: Color.fromARGB(
+                                255,
+                                255,
+                                255,
+                                255,
+                              ),
                               child: CircleAvatar(
                                 radius: 6,
                                 backgroundColor: Color(0xFF34D399),
