@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gestion_gym/core/email_validator.dart';
 import '../main_navigation.dart';
 import 'register_screen.dart';
+import 'reset_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,29 +30,37 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
+    if (!isValidEmail(email)) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Ingresa un correo válido.')),
+      );
+      return;
+    }
     setState(() {
       _isLoading = true;
     });
     try {
-      // simulate network delay or call real auth API
-      await Future.delayed(const Duration(seconds: 1));
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
-      // navigate to central screen (main navigation)
       navigator.pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const MainNavigation(),
-        ),
+        MaterialPageRoute(builder: (context) => const MainNavigation()),
       );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      messenger.showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
+      setState(() {
+        _isLoading = false;
+      });
+      messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -83,7 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 40),
 
-            // Campo de Email
             _buildTextField(
               controller: _emailController,
               label: "Email",
@@ -92,7 +102,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Campo de Contraseña
             _buildTextField(
               controller: _passwordController,
               label: "Contraseña",
@@ -107,12 +116,16 @@ class _LoginScreenState extends State<LoginScreen> {
               },
             ),
 
-            // Olvidaste contraseña
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  // Agregar acción para recuperar contraseña
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ResetPasswordScreen(),
+                    ),
+                  );
                 },
                 child: const Text(
                   "¿Olvidaste tu contraseña?",
@@ -123,7 +136,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
             const SizedBox(height: 20),
 
-            // Botón Entrar
             SizedBox(
               width: double.infinity,
               height: 60,
@@ -157,11 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             const SizedBox(height: 30),
 
-            // Continuar con redes
-            const Text(
-              "Continuar con",
-              style: TextStyle(color: Colors.grey),
-            ),
+            const Text("Continuar con", style: TextStyle(color: Colors.grey)),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -174,7 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 24,
                     height: 24,
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, color: Colors.red),
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.error, color: Colors.red),
                   ),
                 ),
                 IconButton(
@@ -190,22 +199,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
             const SizedBox(height: 40),
 
-            // Registro link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text("¿No tienes cuenta? "),
                 GestureDetector(
                   onTap: () {
-                    // Navegar a pantalla de registro
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterScreen(),
+                      ),
                     );
                   },
                   child: const Text(
                     "Regístrate aquí",
-                    style: TextStyle(color: Colors.indigo, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.indigo,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -246,8 +258,9 @@ class _LoginScreenState extends State<LoginScreen> {
               suffixIcon: isPassword
                   ? IconButton(
                       icon: Icon(
-                          obscureText ? LucideIcons.eyeOff : LucideIcons.eye,
-                          color: Colors.indigo),
+                        obscureText ? LucideIcons.eyeOff : LucideIcons.eye,
+                        color: Colors.indigo,
+                      ),
                       onPressed: toggleObscure,
                     )
                   : null,

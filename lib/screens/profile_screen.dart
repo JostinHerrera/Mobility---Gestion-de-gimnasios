@@ -3,12 +3,20 @@ import 'package:google_fonts/google_fonts.dart';
 import '../main_navigation.dart';
 import 'trainers_list_screen.dart';
 import 'login_screen.dart';
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+import '../firebase_options.dart';
 
 // Pantalla de perfil del usuario con configuración y datos físicos
 class ProfileScreen extends StatefulWidget {
   final bool openEditor;
   final bool initialPublic;
-  const ProfileScreen({super.key, this.openEditor = false, this.initialPublic = true});
+  const ProfileScreen({
+    super.key,
+    this.openEditor = false,
+    this.initialPublic = true,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -18,14 +26,95 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _publicProfile = widget.initialPublic;
+    
+    // Cargar datos una sola vez cuando se crea la pantalla
+    _loadProfileDataOnce();
+
     if (widget.openEditor) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _openEditPhysical(context);
       });
     }
   }
+
+  // Cargar datos una sola vez y actualizar el estado
+  Future<void> _loadProfileDataOnce() async {
+    final data = await _getProfileData();
+    if (!mounted) return;
+
+    if (data != null) {
+      setState(() {
+        name = data['name'] as String? ?? FirebaseAuth.instance.currentUser?.displayName ?? 'Usuario';
+        weight = (data['weight'] as num?)?.toDouble() ?? 75.0;
+        height = (data['height'] as num?)?.toInt() ?? 178;
+        birthDate = _parseDate(data['birthDate'] as String? ?? data['birth_date'] as String?) ?? DateTime(1996, 1, 1);
+        gender = data['gender'] as String? ?? 'Masculino';
+        bodyType = data['bodyType'] as String? ?? data['body_type'] as String? ?? 'Ectomorfo';
+        objective = data['objective'] as String? ?? 'Ganancia muscular';
+        _publicProfile = data['publicProfile'] as bool? ?? data['public_profile'] as bool? ?? true;
+      });
+    } else {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          name = user.displayName ?? 'Usuario';
+          _publicProfile = true;
+        });
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>?> _getProfileData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+
+    try {
+      final idToken = await user.getIdToken();
+      final projectId = DefaultFirebaseOptions.currentPlatform.projectId;
+
+      final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/profiles/${user.uid}',
+      );
+
+      final resp = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $idToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        final json = jsonDecode(resp.body);
+        final fields = json['fields'] as Map<String, dynamic>?;
+
+        if (fields == null) return null;
+
+        Map<String, dynamic> data = {};
+
+        fields.forEach((key, value) {
+          if (value.containsKey('stringValue')) {
+            data[key] = value['stringValue'];
+          } else if (value.containsKey('doubleValue')) {
+            data[key] = (value['doubleValue'] as num).toDouble();
+          } else if (value.containsKey('integerValue')) {
+            data[key] = int.tryParse(value['integerValue'].toString());
+          } else if (value.containsKey('booleanValue')) {
+            data[key] = value['booleanValue'];
+          }
+        });
+
+        return data;
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   // Variables de estado para el perfil público y datos físicos
+  String name = 'Usuario';
   bool _publicProfile = true;
   double weight = 75.0;
   int height = 178;
@@ -38,7 +127,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int get age {
     final now = DateTime.now();
     int calculatedAge = now.year - birthDate.year;
-    if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
       calculatedAge--;
     }
     return calculatedAge;
@@ -254,7 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Alex Johnson',
+                      name,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
@@ -300,7 +390,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   subtitle: const Text('Visibilidad de perfil'),
                   value: _publicProfile,
                   activeThumbColor: kPrimaryIndigo,
-                  onChanged: (v) => setState(() => _publicProfile = v),
+                  onChanged: (v) {
+                    setState(() => _publicProfile = v);
+                    _saveProfileToFirebase();
+                  },
                 ),
               ),
 
@@ -537,6 +630,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // Helper para parsear fechas
+  DateTime? _parseDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return null;
+    try {
+      return DateTime.parse(dateStr);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Función para guardar datos en Firebase
+  Future<void> _saveProfileToFirebase() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      final idToken = await user.getIdToken();
+      final projectId = DefaultFirebaseOptions.currentPlatform.projectId;
+
+      final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents/profiles/${user.uid}',
+      );
+
+      final body = {
+        'fields': {
+          'id': {'stringValue': user.uid},
+          'name': {'stringValue': name},
+          'weight': {'doubleValue': weight},
+          'height': {'integerValue': height.toString()},
+          'birthDate': {'stringValue': birthDate.toIso8601String()},
+          'gender': {'stringValue': gender},
+          'bodyType': {'stringValue': bodyType},
+          'objective': {'stringValue': objective},
+          'publicProfile': {'booleanValue': _publicProfile},
+        }
+      };
+
+      final resp = await http.patch(
+        url,
+        headers: {
+          'Authorization': 'Bearer $idToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (mounted &&
+          resp.statusCode >= 200 &&
+          resp.statusCode < 300) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cambios guardados correctamente'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   // Función para abrir el diálogo de edición de datos físicos
   void _openEditPhysical(BuildContext context) {
     showDialog(
@@ -548,59 +709,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
         initialGender: gender,
         initialBodyType: bodyType,
         initialObjective: objective,
-        onSave: (newWeight, newHeight, newBirthDate, newGender, newBodyType, newObjective) {
-          setState(() {
-            weight = newWeight;
-            height = newHeight;
-            birthDate = newBirthDate;
-            gender = newGender;
-            bodyType = newBodyType;
-            objective = newObjective;
-          });
-          Navigator.of(ctx).pop();
-        },
+        onSave:
+            (
+              newWeight,
+              newHeight,
+              newBirthDate,
+              newGender,
+              newBodyType,
+              newObjective,
+            ) async {
+              setState(() {
+                weight = newWeight;
+                height = newHeight;
+                birthDate = newBirthDate;
+                gender = newGender;
+                bodyType = newBodyType;
+                objective = newObjective;
+              });
+              Navigator.of(ctx).pop();
+              
+              // Guardar en Firebase después de actualizar la UI
+              await _saveProfileToFirebase();
+            },
       ),
     );
   }
 
   // Función para abrir el diálogo de métodos de pago
   void _openPaymentMethods(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => const PaymentMethodDialog(),
-    );
+    showDialog(context: context, builder: (ctx) => const PaymentMethodDialog());
   }
 
   // Función para abrir el diálogo de notificaciones
   void _openNotifications(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => const NotificationsDialog(),
-    );
+    showDialog(context: context, builder: (ctx) => const NotificationsDialog());
   }
 
   // Función para abrir el diálogo de seguridad
   void _openSecurity(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => const SecurityDialog(),
-    );
+    showDialog(context: context, builder: (ctx) => const SecurityDialog());
   }
 
   // Función para abrir el diálogo de soporte
   void _openSupport(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => const SupportDialog(),
-    );
+    showDialog(context: context, builder: (ctx) => const SupportDialog());
   }
 
   // Función para abrir el diálogo de planes
   void _openPlans(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => const PlansDialog(),
-    );
+    showDialog(context: context, builder: (ctx) => const PlansDialog());
   }
 }
 
@@ -747,13 +904,21 @@ class _EditPhysicalDialogState extends State<EditPhysicalDialog> {
 
   final List<String> genderOptions = ['Masculino', 'Femenino'];
   final List<String> bodyTypeOptions = ['Ectomorfo', 'Mesomorfo', 'Endomorfo'];
-  final List<String> objectiveOptions = ['Ganancia muscular', 'Pérdida de peso', 'Mantenimiento'];
+  final List<String> objectiveOptions = [
+    'Ganancia muscular',
+    'Pérdida de peso',
+    'Mantenimiento',
+  ];
 
   @override
   void initState() {
     super.initState();
-    weightController = TextEditingController(text: widget.initialWeight.toString());
-    heightController = TextEditingController(text: widget.initialHeight.toString());
+    weightController = TextEditingController(
+      text: widget.initialWeight.toString(),
+    );
+    heightController = TextEditingController(
+      text: widget.initialHeight.toString(),
+    );
     selectedDate = widget.initialBirthDate;
     selectedGender = widget.initialGender;
     selectedBodyType = widget.initialBodyType;
@@ -803,7 +968,9 @@ class _EditPhysicalDialogState extends State<EditPhysicalDialog> {
             Row(
               children: [
                 Expanded(
-                  child: Text('Fecha de nacimiento: ${selectedDate.toLocal().toString().split(' ')[0]}'),
+                  child: Text(
+                    'Fecha de nacimiento: ${selectedDate.toLocal().toString().split(' ')[0]}',
+                  ),
                 ),
                 TextButton(
                   onPressed: () => _selectDate(context),
@@ -866,9 +1033,18 @@ class _EditPhysicalDialogState extends State<EditPhysicalDialog> {
         ),
         TextButton(
           onPressed: () {
-            final double weight = double.tryParse(weightController.text) ?? widget.initialWeight;
-            final int height = int.tryParse(heightController.text) ?? widget.initialHeight;
-            widget.onSave(weight, height, selectedDate, selectedGender, selectedBodyType, selectedObjective);
+            final double weight =
+                double.tryParse(weightController.text) ?? widget.initialWeight;
+            final int height =
+                int.tryParse(heightController.text) ?? widget.initialHeight;
+            widget.onSave(
+              weight,
+              height,
+              selectedDate,
+              selectedGender,
+              selectedBodyType,
+              selectedObjective,
+            );
           },
           child: const Text('Guardar'),
         ),
@@ -921,7 +1097,8 @@ class _NotificationsDialogState extends State<NotificationsDialog> {
               title: const Text('Recordatorios'),
               subtitle: const Text('Recibe recordatorios de rutinas y citas'),
               value: reminderNotifications,
-              onChanged: (value) => setState(() => reminderNotifications = value),
+              onChanged: (value) =>
+                  setState(() => reminderNotifications = value),
             ),
           ],
         ),
@@ -974,7 +1151,11 @@ class _SecurityDialogState extends State<SecurityDialog> {
                 // Navigate to change password screen
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Funcionalidad de cambio de contraseña (simulada)')),
+                  const SnackBar(
+                    content: Text(
+                      'Funcionalidad de cambio de contraseña (simulada)',
+                    ),
+                  ),
                 );
               },
             ),
@@ -997,7 +1178,9 @@ class _SecurityDialogState extends State<SecurityDialog> {
               onTap: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Dispositivos conectados (simulado)')),
+                  const SnackBar(
+                    content: Text('Dispositivos conectados (simulado)'),
+                  ),
                 );
               },
             ),
@@ -1032,9 +1215,9 @@ class SupportDialog extends StatelessWidget {
               subtitle: const Text('Encuentra respuestas rápidas'),
               onTap: () {
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('FAQ (simulado)')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('FAQ (simulado)')));
               },
             ),
             ListTile(
@@ -1098,13 +1281,23 @@ class PlansDialog extends StatelessWidget {
       {
         'name': 'Premium',
         'price': '9.99€/mes',
-        'features': ['Rutinas ilimitadas', 'Seguimiento IA', 'Soporte prioritario', 'Sin anuncios'],
+        'features': [
+          'Rutinas ilimitadas',
+          'Seguimiento IA',
+          'Soporte prioritario',
+          'Sin anuncios',
+        ],
         'popular': true,
       },
       {
         'name': 'Pro',
         'price': '19.99€/mes',
-        'features': ['Todo lo de Premium', 'Entrenadores personales', 'Análisis avanzado', 'Acceso anticipado'],
+        'features': [
+          'Todo lo de Premium',
+          'Entrenadores personales',
+          'Análisis avanzado',
+          'Acceso anticipado',
+        ],
       },
     ];
 
@@ -1129,19 +1322,28 @@ class PlansDialog extends StatelessWidget {
                       children: [
                         Text(
                           plan['name'] as String,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         if (plan['popular'] == true) ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFF4F46E5),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Text(
                               'Popular',
-                              style: TextStyle(color: Colors.white, fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ],
@@ -1150,21 +1352,33 @@ class PlansDialog extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       plan['price'] as String,
-                      style: const TextStyle(fontSize: 16, color: Color(0xFF4F46E5), fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF4F46E5),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: (plan['features'] as List<String>).map((feature) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.check, size: 16, color: Colors.green),
-                            const SizedBox(width: 8),
-                            Text(feature),
-                          ],
-                        ),
-                      )).toList(),
+                      children: (plan['features'] as List<String>)
+                          .map(
+                            (feature) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: Colors.green,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(feature),
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
                     const SizedBox(height: 12),
                     Align(
@@ -1173,7 +1387,11 @@ class PlansDialog extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Seleccionaste el plan ${plan['name'] as String} (simulado)')),
+                            SnackBar(
+                              content: Text(
+                                'Seleccionaste el plan ${plan['name'] as String} (simulado)',
+                              ),
+                            ),
                           );
                         },
                         child: const Text('Seleccionar'),
@@ -1195,6 +1413,7 @@ class PlansDialog extends StatelessWidget {
     );
   }
 }
+
 // Diálogo para agregar método de pago (nota: usa RadioListTile deprecated, considerar actualizar a RadioGroup)
 class PaymentMethodDialog extends StatefulWidget {
   const PaymentMethodDialog({super.key});
@@ -1320,7 +1539,9 @@ class _PaymentMethodDialogState extends State<PaymentMethodDialog> {
             // Here you would validate and save the payment method
             // For now, just show a snackbar and close
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Método de pago agregado (simulado)')),
+              const SnackBar(
+                content: Text('Método de pago agregado (simulado)'),
+              ),
             );
             Navigator.of(context).pop();
           },

@@ -32,7 +32,10 @@ class _MainNavigationState extends State<MainNavigation> {
       const DashboardScreen(),
       const RoutinesScreen(),
       const ChatListScreen(),
-      ProfileScreen(openEditor: widget.openProfileEditor, initialPublic: widget.initialProfilePublic),
+      ProfileScreen(
+        openEditor: widget.openProfileEditor,
+        initialPublic: widget.initialProfilePublic,
+      ),
     ];
 
     return Scaffold(

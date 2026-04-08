@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gestion_gym/core/email_validator.dart';
 import 'login_screen.dart';
-import '../main_navigation.dart';
 import 'profile_setup_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -17,6 +18,74 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
+  String? _error;
+
+  Future<void> _register() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      setState(() {
+        _isLoading = false;
+        _error = "Completa todos los campos.";
+      });
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setState(() {
+        _isLoading = false;
+        _error = "Ingresa un correo electrónico válido.";
+      });
+      return;
+    }
+
+    try {
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      try {
+        await userCredential.user?.updateDisplayName(name);
+      } catch (_) {}
+
+      try {
+        await userCredential.user?.sendEmailVerification();
+      } catch (_) {}
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ProfileSetupScreen(initialName: name, initialEmail: email),
+          ),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        if (e.code == 'email-already-in-use') {
+          _error = "El correo ya está registrado. Intenta iniciar sesión.";
+        } else {
+          _error = e.message ?? "Error desconocido";
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +128,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 40),
 
-            // Campos de entrada
             _buildInputField(
               controller: _nameController,
               label: "Nombre completo",
@@ -87,24 +155,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 });
               },
             ),
-            
+
             const SizedBox(height: 40),
 
-            // Botón de Registro
             SizedBox(
               width: double.infinity,
               height: 65,
               child: ElevatedButton(
-                onPressed: () {
-                  // Aquí iría la lógica real de registro (validación, API, etc.)
-                  // Por ahora navegamos directamente al perfil como se solicitó.
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileSetupScreen(),
-                    ),
-                  );
-                },
+                onPressed: _isLoading ? null : _register,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kPrimaryIndigo,
                   foregroundColor: Colors.white,
@@ -113,23 +171,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text(
-                  "Registrarse",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        "Registrarse",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
 
+            if (_error != null) ...[
+              const SizedBox(height: 20),
+              Text(_error!, style: const TextStyle(color: Colors.red)),
+            ],
+
             const SizedBox(height: 24),
 
-            // --- LO QUE PEDISTE: ENLACE A LOGIN ---
             Center(
               child: GestureDetector(
                 onTap: () {
-                  // Navegar a la pantalla de Login
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
                   );
                 },
                 child: RichText(
@@ -159,7 +227,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Widget auxiliar para los inputs (reutilizable)
   Widget _buildInputField({
     required TextEditingController controller,
     required String label,
@@ -190,8 +257,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
-                        obscureText ? LucideIcons.eyeOff : LucideIcons.eye,
-                        color: const Color(0xFF4F46E5)),
+                      obscureText ? LucideIcons.eyeOff : LucideIcons.eye,
+                      color: const Color(0xFF4F46E5),
+                    ),
                     onPressed: toggleObscure,
                   )
                 : null,
@@ -206,7 +274,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               borderSide: const BorderSide(color: Color(0xFFF1F5F9), width: 1),
             ),
           ),
-        ),      ],
+        ),
+      ],
     );
   }
 }

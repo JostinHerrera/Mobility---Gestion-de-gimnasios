@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1091819539761",
+    "project_id": "gestion-gym-ae94c",
+    "storage_bucket": "gestion-gym-ae94c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1091819539761:android:2e6f76c0fda7246347b410",
+        "android_client_info": {
+          "package_name": "com.example.gestion_gym"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlBF4Q3rMIPXTsKBTBvLK5TmEuv07UStI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

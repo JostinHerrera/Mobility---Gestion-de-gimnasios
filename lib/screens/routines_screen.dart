@@ -11,6 +11,7 @@ class RoutinesScreen extends StatefulWidget {
 
 class _RoutinesScreenState extends State<RoutinesScreen> {
   String _selectedCategory = 'Todas';
+  bool _isGridView = false;
   final List<String> _categories = [
     'Todas',
     'Fuerza',
@@ -30,8 +31,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 8,
       description:
           'Rutina enfocada en pecho, espalda y hombros para desarrollar fuerza superior.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop',
+      imageUrl: 'assets/images/Press-de-banca.jpg',
     ),
     Routine(
       title: 'Cardio HIIT Intenso',
@@ -42,7 +42,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       description:
           'Entrenamiento de alta intensidad para quemar grasa y mejorar resistencia cardiovascular.',
       imageUrl:
-          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop',
+          'https://images.unsplash.com/photo-1558611848-73f7eb4001e5?w=400&h=250&fit=crop',
     ),
     Routine(
       title: 'Yoga para Principiantes',
@@ -53,7 +53,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       description:
           'Secuencia básica de yoga para mejorar flexibilidad y reducir estrés.',
       imageUrl:
-          'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=250&fit=crop',
+          'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=250&fit=crop',
     ),
     Routine(
       title: 'Pérdida de Peso Express',
@@ -64,7 +64,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       description:
           'Combinación de cardio y fuerza para maximizar la quema de calorías.',
       imageUrl:
-          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop',
+          'https://images.unsplash.com/photo-1517964101978-3b0d9d8b68db?w=400&h=250&fit=crop',
     ),
     Routine(
       title: 'Ganancia Muscular Full Body',
@@ -75,7 +75,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       description:
           'Rutina completa para ganar masa muscular en todo el cuerpo.',
       imageUrl:
-          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop',
+          'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=250&fit=crop',
     ),
     Routine(
       title: 'Estiramiento Diario',
@@ -86,7 +86,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       description:
           'Rutina de estiramiento para mantener la movilidad y prevenir lesiones.',
       imageUrl:
-          'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=250&fit=crop',
+          'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=250&fit=crop',
     ),
   ];
 
@@ -362,33 +362,93 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
             // Lista de rutinas
             Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: Text(
-                _selectedCategory == 'Todas'
-                    ? 'Rutinas disponibles'
-                    : 'Rutinas de $_selectedCategory',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: sectionTitleFontSize,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _selectedCategory == 'Todas'
+                        ? 'Rutinas disponibles'
+                        : 'Rutinas de $_selectedCategory',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: sectionTitleFontSize,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => setState(() => _isGridView = false),
+                        icon: Icon(
+                          Icons.list,
+                          color: !_isGridView ? kPrimaryIndigo : Colors.grey,
+                        ),
+                        tooltip: 'Vista de lista',
+                      ),
+                      IconButton(
+                        onPressed: () => setState(() => _isGridView = true),
+                        icon: Icon(
+                          Icons.grid_view,
+                          color: _isGridView ? kPrimaryIndigo : Colors.grey,
+                        ),
+                        tooltip: 'Vista de cuadrícula',
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 12),
 
-            // Lista
+            // Lista / Cuadrícula
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                itemCount: _filteredRoutines.length,
-                itemBuilder: (context, index) {
-                  return _RoutineCard(
-                    routine: _filteredRoutines[index],
-                    onPressed: () =>
-                        _showExercisesDialog(context, _filteredRoutines[index]),
-                    isMobile: isMobile,
-                    isTablet: isTablet,
-                  );
-                },
-              ),
+              child: _isGridView
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                      ),
+                      child: GridView.builder(
+                        itemCount: _filteredRoutines.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: isMobile
+                              ? 1
+                              : isTablet
+                              ? 2
+                              : 3,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: isMobile
+                              ? 1.4
+                              : isTablet
+                              ? 1.25
+                              : 1.20,
+                        ),
+                        itemBuilder: (context, index) {
+                          final routine = _filteredRoutines[index];
+                          return _RoutineGridCard(
+                            routine: routine,
+                            onPressed: () =>
+                                _showExercisesDialog(context, routine),
+                          );
+                        },
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                      ),
+                      itemCount: _filteredRoutines.length,
+                      itemBuilder: (context, index) {
+                        return _RoutineCard(
+                          routine: _filteredRoutines[index],
+                          onPressed: () => _showExercisesDialog(
+                            context,
+                            _filteredRoutines[index],
+                          ),
+                          isMobile: isMobile,
+                          isTablet: isTablet,
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -428,7 +488,7 @@ class Routine {
             'reps': '8-10',
             'rest': '90s',
             'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+                'https://www.cambiatufisico.com/wp-content/uploads/programa-de-entrenamiento-de-fuerza.jpg',
           },
           {
             'name': 'Dominadas',
@@ -924,7 +984,9 @@ class _RoutineCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: NetworkImage(routine.imageUrl),
+                  image: routine.imageUrl.startsWith('http')
+                      ? NetworkImage(routine.imageUrl)
+                      : AssetImage(routine.imageUrl) as ImageProvider,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -1019,7 +1081,140 @@ class _RoutineCard extends StatelessWidget {
       case 'avanzado':
         return Colors.red;
       default:
-        return Colors.grey;
+        return Colors.blue;
+    }
+  }
+}
+
+// Widget para tarjeta de rutina en cuadrícula
+class _RoutineGridCard extends StatelessWidget {
+  final Routine routine;
+  final VoidCallback onPressed;
+
+  const _RoutineGridCard({required this.routine, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = GoogleFonts.plusJakartaSansTextTheme(
+      Theme.of(context).textTheme,
+    );
+
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(32),
+              blurRadius: 18,
+              spreadRadius: 1.5,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              child: routine.imageUrl.startsWith('http')
+                  ? Image.network(
+                      routine.imageUrl,
+                      height: 110,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      routine.imageUrl,
+                      height: 110,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    routine.title,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    routine.description,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      _InfoChip(
+                        icon: Icons.timer,
+                        text: routine.duration,
+                        isCompact: true,
+                      ),
+                      _InfoChip(
+                        icon: Icons.fitness_center,
+                        text: '${routine.exercises} ejercicios',
+                        isCompact: true,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getDifficultyColor(
+                            routine.difficulty,
+                          ).withAlpha(30),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          routine.difficulty,
+                          style: TextStyle(
+                            color: _getDifficultyColor(routine.difficulty),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getDifficultyColor(String difficulty) {
+    switch (difficulty.toLowerCase()) {
+      case 'principiante':
+        return Colors.green;
+      case 'intermedio':
+        return Colors.orange;
+      case 'avanzado':
+        return Colors.red;
+      default:
+        return Colors.blue;
     }
   }
 }
