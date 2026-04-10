@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:gestion_gym/core/email_validator.dart';
 import '../main_navigation.dart';
 import 'register_screen.dart';
@@ -18,6 +21,106 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+
+  Future<void> _signInWithGoogle() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    setState(() => _isLoading = true);
+    try {
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      if (!mounted) return;
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainNavigation()),
+      );
+    } on FirebaseAuthException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _signInWithFacebook() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    setState(() => _isLoading = true);
+    try {
+      final result = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'],
+      );
+
+      if (result.status != LoginStatus.success || result.accessToken == null) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Inicio de sesión con Facebook cancelado.')),
+        );
+        return;
+      }
+
+      final credential = FacebookAuthProvider.credential(result.accessToken!.tokenString);
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      if (!mounted) return;
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainNavigation()),
+      );
+    } on FirebaseAuthException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _signInWithApple() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    if (!await SignInWithApple.isAvailable()) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Inicio de sesión con Apple no está disponible en este dispositivo.')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      if (!mounted) return;
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainNavigation()),
+      );
+    } on FirebaseAuthException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   void _login(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -69,14 +172,14 @@ class _LoginScreenState extends State<LoginScreen> {
     const kPrimaryIndigo = Color(0xFF4F46E5);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8FAFF),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(30.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -127,24 +230,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   );
                 },
-                child: const Text(
-                  "¿Olvidaste tu contraseña?",
-                  style: TextStyle(color: Colors.indigo),
+                style: TextButton.styleFrom(
+                  foregroundColor: kPrimaryIndigo,
+                  textStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+                child: const Text('¿Olvidaste tu contraseña?'),
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             SizedBox(
               width: double.infinity,
-              height: 60,
+              height: 54,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : () => _login(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimaryIndigo,
+                  backgroundColor: const Color(0xFF1F2937),
+                  elevation: 3,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                 ),
                 child: _isLoading
@@ -157,11 +266,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 15,
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(LucideIcons.arrowRight, color: Colors.white),
+                          Icon(LucideIcons.arrowRight, color: Colors.white, size: 18),
                         ],
                       ),
               ),
@@ -175,23 +284,25 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: () {},
-                  iconSize: 24,
-                  icon: Image.network(
-                    'https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png',
-                    width: 24,
-                    height: 24,
+                  onPressed: _isLoading ? null : _signInWithGoogle,
+                  iconSize: 28,
+                  icon: Image.asset(
+                    'assets/images/google.png',
+                    width: 28,
+                    height: 28,
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.error, color: Colors.red),
                   ),
                 ),
+                const SizedBox(width: 16),
                 IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.facebook, color: Colors.blue),
+                  onPressed: _isLoading ? null : _signInWithFacebook,
+                  iconSize: 28,
+                  icon: const Icon(Icons.facebook, color: Color(0xFF1877F2)),
                 ),
+                const SizedBox(width: 16),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: _isLoading ? null : _signInWithApple,
+                  iconSize: 28,
                   icon: const Icon(Icons.apple, color: Colors.black),
                 ),
               ],

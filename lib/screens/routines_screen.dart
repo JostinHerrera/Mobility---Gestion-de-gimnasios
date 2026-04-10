@@ -31,7 +31,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 8,
       description:
           'Rutina enfocada en pecho, espalda y hombros para desarrollar fuerza superior.',
-      imageUrl: 'assets/images/Press-de-banca.jpg',
+      imageUrl: 'assets/images/fuerza_superior_completa.jpg',
     ),
     Routine(
       title: 'Cardio HIIT Intenso',
@@ -41,8 +41,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 6,
       description:
           'Entrenamiento de alta intensidad para quemar grasa y mejorar resistencia cardiovascular.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1558611848-73f7eb4001e5?w=400&h=250&fit=crop',
+      imageUrl: 'assets/images/cardio_hiit.jpg',
     ),
     Routine(
       title: 'Yoga para Principiantes',
@@ -52,8 +51,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 10,
       description:
           'Secuencia básica de yoga para mejorar flexibilidad y reducir estrés.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=250&fit=crop',
+      imageUrl: 'assets/images/yoga_principiantes.jpg',
     ),
     Routine(
       title: 'Pérdida de Peso Express',
@@ -63,8 +61,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 7,
       description:
           'Combinación de cardio y fuerza para maximizar la quema de calorías.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1517964101978-3b0d9d8b68db?w=400&h=250&fit=crop',
+      imageUrl: 'assets/images/perdida_peso_express.jpg',
     ),
     Routine(
       title: 'Ganancia Muscular Full Body',
@@ -74,8 +71,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 12,
       description:
           'Rutina completa para ganar masa muscular en todo el cuerpo.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=250&fit=crop',
+      imageUrl: 'assets/images/ganancia_muscular_full_body.jpg',
     ),
     Routine(
       title: 'Estiramiento Diario',
@@ -85,8 +81,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 8,
       description:
           'Rutina de estiramiento para mantener la movilidad y prevenir lesiones.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=250&fit=crop',
+      imageUrl: 'assets/images/estiramiento_diario.jpg',
     ),
   ];
 
@@ -138,15 +133,25 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Imagen del ejercicio
-                        Container(
-                          width: double.infinity,
-                          height: isMobile ? 120 : 150,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            image: DecorationImage(
-                              image: NetworkImage(exercise['imageUrl']!),
-                              fit: BoxFit.cover,
-                            ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image(
+                            image: _buildImageProvider(exercise['imageUrl']!),
+                            width: double.infinity,
+                            height: isMobile ? 120 : 150,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: double.infinity,
+                                height: isMobile ? 120 : 150,
+                                color: const Color(0xFFEBEEF5),
+                                child: const Icon(
+                                  Icons.image_not_supported_outlined,
+                                  color: Colors.grey,
+                                  size: 36,
+                                ),
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -409,18 +414,10 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
                       child: GridView.builder(
                         itemCount: _filteredRoutines.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: isMobile
-                              ? 1
-                              : isTablet
-                              ? 2
-                              : 3,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: isMobile
-                              ? 1.4
-                              : isTablet
-                              ? 1.25
-                              : 1.20,
+                              crossAxisCount: isMobile ? 2 : isTablet ? 2 : 3,
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
+                          childAspectRatio: isMobile ? 0.82 : isTablet ? 0.92 : 1.0,
                         ),
                         itemBuilder: (context, index) {
                           final routine = _filteredRoutines[index];
@@ -496,7 +493,7 @@ class Routine {
             'reps': '6-8',
             'rest': '120s',
             'imageUrl':
-                'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
+                'https://rlgrips.com/wp-content/uploads/2024/10/chico-dominadas.jpg',
           },
           {
             'name': 'Press militar',
@@ -921,6 +918,12 @@ class Routine {
   }
 }
 
+ImageProvider<Object> _buildImageProvider(String imageUrl) {
+  return imageUrl.startsWith('http')
+      ? NetworkImage(imageUrl)
+      : AssetImage(imageUrl);
+}
+
 // Widget para tarjeta de rutina normal (vertical)
 class _RoutineCard extends StatelessWidget {
   final Routine routine;
@@ -984,9 +987,7 @@ class _RoutineCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: routine.imageUrl.startsWith('http')
-                      ? NetworkImage(routine.imageUrl)
-                      : AssetImage(routine.imageUrl) as ImageProvider,
+                  image: _buildImageProvider(routine.imageUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -1121,19 +1122,24 @@ class _RoutineGridCard extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16),
               ),
-              child: routine.imageUrl.startsWith('http')
-                  ? Image.network(
-                      routine.imageUrl,
-                      height: 110,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.asset(
-                      routine.imageUrl,
-                      height: 110,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+              child: Image(
+                image: _buildImageProvider(routine.imageUrl),
+                height: 110,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 110,
+                    width: double.infinity,
+                    color: const Color(0xFFEBEEF5),
+                    child: const Icon(
+                      Icons.image_not_supported_outlined,
+                      color: Colors.grey,
+                      size: 36,
                     ),
+                  );
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(12),

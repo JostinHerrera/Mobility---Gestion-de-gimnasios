@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import '../firebase_options.dart';
 import '../main_navigation.dart';
-import 'login_screen.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   final String? initialName;
@@ -165,7 +164,33 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Card(
+              margin: const EdgeInsets.only(bottom: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Datos físicos',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Agrega tu peso, altura y demás datos para personalizar tu perfil.',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             _inputCard(label: 'Peso (kg)', controller: weightController),
             _inputCard(label: 'Altura (cm)', controller: heightController),
 
@@ -195,6 +220,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             const SizedBox(height: 12),
 
             Card(
+              margin: const EdgeInsets.only(bottom: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 1,
               child: SwitchListTile(
                 title: const Text('Perfil público'),
                 value: _publicProfile,
@@ -202,21 +232,30 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
-
             if (_error != null)
               Text(_error!, style: const TextStyle(color: Colors.red)),
 
-            const SizedBox(height: 10),
+            if (_error != null) const SizedBox(height: 10),
 
             SizedBox(
               width: double.infinity,
-              height: 55,
               child: ElevatedButton(
                 onPressed: _canSave && !_isSaving ? _guardarPerfil : null,
-                style: ElevatedButton.styleFrom(backgroundColor: kPrimary),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1F2937),
+                  elevation: 5,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                ),
                 child: _isSaving
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                      )
                     : const Text('Completar'),
               ),
             ),
@@ -230,41 +269,48 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     required String label,
     required TextEditingController controller,
   }) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFF),
-        borderRadius: BorderRadius.circular(12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: TextField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(labelText: label, border: InputBorder.none),
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            labelText: label,
+            border: InputBorder.none,
+          ),
+        ),
       ),
     );
   }
 
   Widget _dateCard() {
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFF),
-        borderRadius: BorderRadius.circular(12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              'Fecha: ${birthDate.toLocal().toString().split(' ')[0]}',
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Fecha: ${birthDate.toLocal().toString().split(' ')[0]}',
+              ),
             ),
-          ),
-          TextButton(
-            onPressed: () => _selectDate(context),
-            child: const Text('Seleccionar'),
-          ),
-        ],
+            TextButton(
+              onPressed: () => _selectDate(context),
+              child: const Text('Seleccionar'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -275,20 +321,25 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     List<String> items,
     Function(String?) onChanged,
   ) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFF),
-        borderRadius: BorderRadius.circular(12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: DropdownButtonFormField<String>(
-        value: value,
-        decoration: InputDecoration(labelText: label, border: InputBorder.none),
-        items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
-        onChanged: onChanged,
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: DropdownButtonFormField<String>(
+          initialValue: value,
+          decoration: InputDecoration(
+            labelText: label,
+            border: InputBorder.none,
+          ),
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: onChanged,
+        ),
       ),
     );
   }

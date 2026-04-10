@@ -51,8 +51,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const kPrimaryIndigo = Color(0xFF4F46E5);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Recuperar contraseña'),
@@ -60,36 +58,65 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         foregroundColor: Colors.black,
         elevation: 0,
       ),
-      backgroundColor: Colors.white,
-      body: Padding(
+      backgroundColor: const Color(0xFFF8FAFF),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            const Text(
-              'Ingresa el correo asociado a tu cuenta y recibirás un enlace para restablecer tu contraseña.',
-              style: TextStyle(fontSize: 16, color: Colors.black87),
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              elevation: 1,
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Restablece tu contraseña',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Ingresa el correo asociado a tu cuenta y recibirás un enlace para restablecer tu contraseña.',
+                      style: TextStyle(fontSize: 15, color: Colors.black87),
+                    ),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Correo electrónico',
                 hintText: 'correo@ejemplo.com',
-                prefixIcon: Icon(LucideIcons.mail),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(LucideIcons.mail, color: Color(0xFF4F46E5)),
+                filled: true,
+                fillColor: const Color(0xFFF8FAFF),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: 52,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _sendResetEmail,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimaryIndigo,
+                  backgroundColor: const Color(0xFF1F2937),
+                  elevation: 3,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -99,8 +126,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     : const Text(
                         'Enviar correo de recuperación',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
               ),
