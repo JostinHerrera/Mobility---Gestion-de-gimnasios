@@ -14,7 +14,7 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
   // Estado para filtros de categorías
   String _activeFilter = "Todos";
   final List<String> _categories = [
@@ -24,6 +24,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
     "Yoga",
     "Estudio",
   ];
+
+  late AnimationController _logoPulseController;
+  late Animation<double> _logoPulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Controlador para la animación de pulso del logo
+    _logoPulseController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    // Animación de pulso sutil (de 1.0 a 1.05)
+    _logoPulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(
+      parent: _logoPulseController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _logoPulseController.dispose();
+    super.dispose();
+  }
 
   // Datos mock de gimnasios
   final List<Gym> _allGyms = [
@@ -134,15 +163,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // logo encabezado centrado
+                  // logo encabezado centrado con animación sutil
                   Center(
-                    child: Text(
-                      "Mobility GYM",
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: const Color(0xFF0F172A),
-                      ),
+                    child: AnimatedBuilder(
+                      animation: _logoPulseController,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _logoPulseAnimation.value,
+                          child: Text(
+                            "Mobility GYM",
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFF0F172A),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 20),

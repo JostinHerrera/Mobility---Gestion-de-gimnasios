@@ -7,6 +7,10 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import '../firebase_options.dart';
+import 'dart:async';
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 // Pantalla de perfil del usuario con configuración y datos físicos
 class ProfileScreen extends StatefulWidget {
@@ -26,7 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Cargar datos una sola vez cuando se crea la pantalla
     _loadProfileDataOnce();
 
@@ -44,14 +48,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (data != null) {
       setState(() {
-        name = data['name'] as String? ?? FirebaseAuth.instance.currentUser?.displayName ?? 'Usuario';
+        name =
+            data['name'] as String? ??
+            FirebaseAuth.instance.currentUser?.displayName ??
+            'Usuario';
         weight = (data['weight'] as num?)?.toDouble() ?? 75.0;
         height = (data['height'] as num?)?.toInt() ?? 178;
-        birthDate = _parseDate(data['birthDate'] as String? ?? data['birth_date'] as String?) ?? DateTime(1996, 1, 1);
+        birthDate =
+            _parseDate(
+              data['birthDate'] as String? ?? data['birth_date'] as String?,
+            ) ??
+            DateTime(1996, 1, 1);
         gender = data['gender'] as String? ?? 'Masculino';
-        bodyType = data['bodyType'] as String? ?? data['body_type'] as String? ?? 'Ectomorfo';
+        bodyType =
+            data['bodyType'] as String? ??
+            data['body_type'] as String? ??
+            'Ectomorfo';
         objective = data['objective'] as String? ?? 'Ganancia muscular';
-        _publicProfile = data['publicProfile'] as bool? ?? data['public_profile'] as bool? ?? true;
+        _publicProfile =
+            data['publicProfile'] as bool? ??
+            data['public_profile'] as bool? ??
+            true;
+        _planType =
+            data['planType'] as String? ??
+            data['plan_type'] as String? ??
+            'Premium';
+        _profileImagePath =
+            data['profileImagePath'] as String? ??
+            data['profile_image_path'] as String?;
+        _profileImageUrl =
+            data['profileImageUrl'] as String? ??
+            data['profile_image_url'] as String?;
       });
     } else {
       final user = FirebaseAuth.instance.currentUser;
@@ -122,16 +149,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String gender = 'Masculino';
   String bodyType = 'Ectomorfo';
   String objective = 'Ganancia muscular';
+  String _planType = 'Premium'; // 'Free' o 'Premium'
+  String? _profileImagePath; // Ruta de la imagen de perfil local
+  String? _profileImageUrl; // URL de la imagen de perfil en Firebase Storage
+  Uint8List? _profileImageBytes; // Bytes de imagen para web
 
-  // Getter para calcular la edad basada en la fecha de nacimiento
+  // Variable cached para la edad
+  int _cachedAge = 28;
+
+  // Timer para debounce del guardado automático
+  Timer? _saveTimer;
+
+  // Getter para calcular la edad (usando cache)
   int get age {
+    // Recalcular solo si la fecha cambió significativamente
     final now = DateTime.now();
     int calculatedAge = now.year - birthDate.year;
     if (now.month < birthDate.month ||
         (now.month == birthDate.month && now.day < birthDate.day)) {
       calculatedAge--;
     }
-    return calculatedAge;
+
+    // Actualizar cache si cambió
+    if (calculatedAge != _cachedAge) {
+      _cachedAge = calculatedAge;
+    }
+
+    return _cachedAge;
+  }
+
+  // Método con debounce para guardar el perfil
+  void _debouncedSaveProfile() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 1000), () {
+      _saveProfileToFirebase();
+    });
   }
 
   @override
@@ -318,25 +370,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         CircleAvatar(
                           radius: 36,
                           backgroundColor: const Color(0xFFF3F4FF),
-                          child: Icon(
-                            Icons.person,
-                            size: 36,
-                            color: kPrimaryIndigo,
-                          ),
+                          backgroundImage:
+                              _profileImageUrl != null &&
+                                      _profileImageUrl!.isNotEmpty
+                                  ? NetworkImage(_profileImageUrl!)
+                                  : _profileImageBytes != null
+                                      ? MemoryImage(_profileImageBytes!) as ImageProvider
+                                      : null,
+                          child:
+                              (_profileImageUrl == null ||
+                                      _profileImageUrl!.isEmpty) &&
+                                  _profileImageBytes == null
+                              ? Icon(
+                                  Icons.person,
+                                  size: 36,
+                                  color: kPrimaryIndigo,
+                                )
+                              : null,
                         ),
                         Positioned(
                           right: 0,
                           bottom: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: kPrimaryIndigo,
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(6),
-                            child: const Icon(
-                              Icons.flash_on,
-                              color: Colors.white,
-                              size: 14,
+                          child: GestureDetector(
+                            onTap: _pickProfileImage,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: kPrimaryIndigo,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(6),
+                              child: const Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                                size: 14,
+                              ),
                             ),
                           ),
                         ),
@@ -351,7 +418,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'MIEMBRO PREMIUM',
+                      _planType == 'Pro'
+                          ? 'MIEMBRO PRO'
+                          : _planType == 'FREE'
+                          ? 'MIEMBRO PREMIUM'
+                          : 'MIEMBRO FREE',
                       style: textTheme.bodySmall?.copyWith(color: Colors.grey),
                     ),
                     const SizedBox(height: 12),
@@ -392,7 +463,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   activeThumbColor: kPrimaryIndigo,
                   onChanged: (v) {
                     setState(() => _publicProfile = v);
-                    _saveProfileToFirebase();
+                    _debouncedSaveProfile();
                   },
                 ),
               ),
@@ -630,6 +701,120 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    _saveTimer?.cancel();
+    super.dispose();
+  }
+
+  // Método para seleccionar imagen desde el explorador
+  Future<void> _pickProfileImage() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+        withData: true,
+      );
+
+      if (result != null) {
+        final file = result.files.single;
+        final bytes = file.bytes;
+
+        if (bytes != null) {
+          setState(() {
+            _profileImageBytes = bytes;
+            _profileImagePath = null;
+          });
+          await _saveProfileImageToFirebase(
+            imageBytes: bytes,
+            fileName: file.name,
+          );
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('No se pudo leer la imagen seleccionada.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al seleccionar imagen: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Método para guardar imagen en Firebase Storage
+  Future<void> _saveProfileImageToFirebase({
+    Uint8List? imageBytes,
+    String? fileName,
+  }) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      if (imageBytes == null) {
+        throw Exception('No se proporcionó archivo de imagen válido.');
+      }
+
+      final extension = fileName?.split('.').last ?? 'jpg';
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_images')
+          .child('${user.uid}.$extension');
+
+      final uploadTask = storageRef.putData(
+        imageBytes,
+        SettableMetadata(contentType: 'image/$extension'),
+      );
+
+      final snapshot = await uploadTask.whenComplete(() {});
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      setState(() {
+        _profileImageUrl = downloadUrl;
+        _profileImagePath = null;
+        _profileImageBytes = null;
+      });
+
+      await _saveProfileToFirebase();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Imagen de perfil actualizada correctamente'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al subir imagen: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Método para cambiar el plan
+  void _changePlan(String newPlan) {
+    setState(() {
+      _planType = newPlan;
+    });
+    _saveProfileToFirebase(); // Guardar el cambio en Firebase
+  }
+
   // Helper para parsear fechas
   DateTime? _parseDate(String? dateStr) {
     if (dateStr == null || dateStr.isEmpty) return null;
@@ -664,7 +849,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'bodyType': {'stringValue': bodyType},
           'objective': {'stringValue': objective},
           'publicProfile': {'booleanValue': _publicProfile},
-        }
+          'planType': {'stringValue': _planType},
+          'profileImagePath': {'stringValue': _profileImagePath ?? ''},
+          'profileImageUrl': {'stringValue': _profileImageUrl ?? ''},
+        },
       };
 
       final resp = await http.patch(
@@ -676,9 +864,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: jsonEncode(body),
       );
 
-      if (mounted &&
-          resp.statusCode >= 200 &&
-          resp.statusCode < 300) {
+      if (mounted && resp.statusCode >= 200 && resp.statusCode < 300) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Cambios guardados correctamente'),
@@ -727,7 +913,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 objective = newObjective;
               });
               Navigator.of(ctx).pop();
-              
+
               // Guardar en Firebase después de actualizar la UI
               await _saveProfileToFirebase();
             },
@@ -757,7 +943,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Función para abrir el diálogo de planes
   void _openPlans(BuildContext context) {
-    showDialog(context: context, builder: (ctx) => const PlansDialog());
+    showDialog(
+      context: context,
+      builder: (ctx) => PlansDialog(onPaymentSuccess: _changePlan),
+    );
   }
 }
 
@@ -1268,7 +1457,8 @@ class SupportDialog extends StatelessWidget {
 
 // Diálogo para mostrar planes de suscripción
 class PlansDialog extends StatelessWidget {
-  const PlansDialog({super.key});
+  final Function(String) onPaymentSuccess;
+  const PlansDialog({super.key, required this.onPaymentSuccess});
 
   @override
   Widget build(BuildContext context) {
@@ -1385,12 +1575,20 @@ class PlansDialog extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Seleccionaste el plan ${plan['name'] as String} (simulado)',
-                              ),
+                          final planName = plan['name'] as String;
+                          final planPrice = plan['price'] as String;
+
+                          Navigator.of(
+                            context,
+                          ).pop(); // Cerrar diálogo de planes
+
+                          // Abrir diálogo de pago
+                          showDialog(
+                            context: context,
+                            builder: (paymentCtx) => PaymentDialog(
+                              planName: planName,
+                              planPrice: planPrice,
+                              onPaymentSuccess: onPaymentSuccess,
                             ),
                           );
                         },
@@ -1546,6 +1744,210 @@ class _PaymentMethodDialogState extends State<PaymentMethodDialog> {
             Navigator.of(context).pop();
           },
           child: const Text('Agregar'),
+        ),
+      ],
+    );
+  }
+}
+
+// Diálogo para procesar el pago de un plan
+class PaymentDialog extends StatefulWidget {
+  final String planName;
+  final String planPrice;
+  final Function(String) onPaymentSuccess;
+
+  const PaymentDialog({
+    super.key,
+    required this.planName,
+    required this.planPrice,
+    required this.onPaymentSuccess,
+  });
+
+  @override
+  State<PaymentDialog> createState() => _PaymentDialogState();
+}
+
+class _PaymentDialogState extends State<PaymentDialog> {
+  String selectedPaymentMethod = 'card';
+  bool isProcessing = false;
+
+  // Controladores para tarjeta
+  final TextEditingController cardNumberController = TextEditingController();
+  final TextEditingController expiryController = TextEditingController();
+  final TextEditingController cvvController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    cardNumberController.dispose();
+    expiryController.dispose();
+    cvvController.dispose();
+    nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _processPayment() async {
+    if (selectedPaymentMethod == 'card') {
+      if (cardNumberController.text.isEmpty ||
+          expiryController.text.isEmpty ||
+          cvvController.text.isEmpty ||
+          nameController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Por favor completa todos los campos'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+
+    setState(() => isProcessing = true);
+
+    // Simular procesamiento de pago
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (mounted) {
+      setState(() => isProcessing = false);
+
+      // Llamar al callback de éxito
+      widget.onPaymentSuccess(widget.planName == 'Premium' ? 'Premium' : 'Pro');
+
+      Navigator.of(context).pop(); // Cerrar diálogo de pago
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('¡Pago exitoso! Plan ${widget.planName} activado'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Pagar Plan ${widget.planName}'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Precio: ${widget.planPrice}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF4F46E5),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('Selecciona método de pago:'),
+            Column(
+              children: [
+                ListTile(
+                  title: const Text('Tarjeta de Crédito/Débito'),
+                  leading: Radio<String>(
+                    value: 'card',
+                    groupValue: selectedPaymentMethod,
+                    onChanged: (value) =>
+                        setState(() => selectedPaymentMethod = value!),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('PayPal'),
+                  leading: Radio<String>(
+                    value: 'paypal',
+                    groupValue: selectedPaymentMethod,
+                    onChanged: (value) =>
+                        setState(() => selectedPaymentMethod = value!),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (selectedPaymentMethod == 'card') ...[
+              TextField(
+                controller: cardNumberController,
+                decoration: const InputDecoration(
+                  labelText: 'Número de Tarjeta',
+                  hintText: '1234 5678 9012 3456',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: expiryController,
+                      decoration: const InputDecoration(
+                        labelText: 'Fecha de Expiración',
+                        hintText: 'MM/YY',
+                      ),
+                      keyboardType: TextInputType.datetime,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextField(
+                      controller: cvvController,
+                      decoration: const InputDecoration(
+                        labelText: 'CVV',
+                        hintText: '123',
+                      ),
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                    ),
+                  ),
+                ],
+              ),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre en la Tarjeta',
+                  hintText: 'Juan Pérez',
+                ),
+              ),
+            ] else ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.paypal, color: Colors.blue),
+                    SizedBox(width: 12),
+                    Text('Serás redirigido a PayPal para completar el pago'),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: isProcessing ? null : _processPayment,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF4F46E5),
+            foregroundColor: Colors.white,
+          ),
+          child: isProcessing
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text('Pagar'),
         ),
       ],
     );

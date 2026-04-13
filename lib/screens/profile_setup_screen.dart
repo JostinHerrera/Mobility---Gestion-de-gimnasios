@@ -67,9 +67,28 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       initialDate: birthDate,
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      initialDatePickerMode: DatePickerMode.day,
+      helpText: 'Selecciona tu fecha de nacimiento',
+      cancelText: 'Cancelar',
+      confirmText: 'Aceptar',
+      fieldHintText: 'DD/MM/YYYY',
+      fieldLabelText: 'Fecha de nacimiento',
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF4F46E5),
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
-    if (picked != null) {
+    if (picked != null && picked != birthDate) {
       setState(() => birthDate = picked);
     }
   }
@@ -179,7 +198,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   children: const [
                     Text(
                       'Datos físicos',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 8),
                     Text(
@@ -237,26 +259,34 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
             if (_error != null) const SizedBox(height: 10),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _canSave && !_isSaving ? _guardarPerfil : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1F2937),
-                  elevation: 5,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+            Center(
+              child: SizedBox(
+                width: 200,
+                child: ElevatedButton(
+                  onPressed: _canSave && !_isSaving ? _guardarPerfil : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1F2937),
+                    elevation: 5,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Text('Completar'),
                 ),
-                child: _isSaving
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                      )
-                    : const Text('Completar'),
               ),
             ),
           ],
@@ -269,11 +299,20 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     required String label,
     required TextEditingController controller,
   }) {
+    IconData getIconForLabel(String label) {
+      switch (label.toLowerCase()) {
+        case 'peso (kg)':
+          return Icons.monitor_weight;
+        case 'altura (cm)':
+          return Icons.height;
+        default:
+          return Icons.edit;
+      }
+    }
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 1,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -283,6 +322,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           decoration: InputDecoration(
             labelText: label,
             border: InputBorder.none,
+            prefixIcon: Icon(
+              getIconForLabel(label),
+              color: const Color(0xFF4F46E5),
+              size: 20,
+            ),
           ),
         ),
       ),
@@ -292,24 +336,47 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Widget _dateCard() {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Fecha: ${birthDate.toLocal().toString().split(' ')[0]}',
+      child: InkWell(
+        onTap: () => _selectDate(context),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.calendar_today,
+                color: Color(0xFF4F46E5),
+                size: 20,
               ),
-            ),
-            TextButton(
-              onPressed: () => _selectDate(context),
-              child: const Text('Seleccionar'),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Fecha de nacimiento',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${birthDate.day.toString().padLeft(2, '0')}/${birthDate.month.toString().padLeft(2, '0')}/${birthDate.year}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+            ],
+          ),
         ),
       ),
     );
@@ -321,11 +388,22 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     List<String> items,
     Function(String?) onChanged,
   ) {
+    IconData getIconForLabel(String label) {
+      switch (label.toLowerCase()) {
+        case 'sexo':
+          return Icons.person;
+        case 'tipo de cuerpo':
+          return Icons.fitness_center;
+        case 'objetivo':
+          return Icons.flag;
+        default:
+          return Icons.arrow_drop_down;
+      }
+    }
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 1,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -334,6 +412,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           decoration: InputDecoration(
             labelText: label,
             border: InputBorder.none,
+            prefixIcon: Icon(
+              getIconForLabel(label),
+              color: const Color(0xFF4F46E5),
+              size: 20,
+            ),
           ),
           items: items
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))

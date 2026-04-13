@@ -3,14 +3,16 @@ import 'package:google_fonts/google_fonts.dart';
 
 // Pantalla de rutinas con diseño profesional y contenido completo
 class RoutinesScreen extends StatefulWidget {
-  const RoutinesScreen({super.key});
+  final String initialCategory;
+
+  const RoutinesScreen({super.key, this.initialCategory = 'Todas'});
 
   @override
   State<RoutinesScreen> createState() => _RoutinesScreenState();
 }
 
 class _RoutinesScreenState extends State<RoutinesScreen> {
-  String _selectedCategory = 'Todas';
+  late String _selectedCategory;
   bool _isGridView = false;
   final List<String> _categories = [
     'Todas',
@@ -31,7 +33,8 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 8,
       description:
           'Rutina enfocada en pecho, espalda y hombros para desarrollar fuerza superior.',
-      imageUrl: 'assets/images/fuerza_superior_completa.jpg',
+      imageUrl:
+          'https://images.unsplash.com/photo-1594737625785-1e3de112e1d4?w=600&h=400&fit=crop',
     ),
     Routine(
       title: 'Cardio HIIT Intenso',
@@ -41,7 +44,8 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 6,
       description:
           'Entrenamiento de alta intensidad para quemar grasa y mejorar resistencia cardiovascular.',
-      imageUrl: 'assets/images/cardio_hiit.jpg',
+      imageUrl:
+          'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&h=400&fit=crop',
     ),
     Routine(
       title: 'Yoga para Principiantes',
@@ -51,7 +55,8 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 10,
       description:
           'Secuencia básica de yoga para mejorar flexibilidad y reducir estrés.',
-      imageUrl: 'assets/images/yoga_principiantes.jpg',
+      imageUrl:
+          'https://images.unsplash.com/photo-1552074282-5c317d1f223b?w=600&h=400&fit=crop',
     ),
     Routine(
       title: 'Pérdida de Peso Express',
@@ -61,7 +66,8 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 7,
       description:
           'Combinación de cardio y fuerza para maximizar la quema de calorías.',
-      imageUrl: 'assets/images/perdida_peso_express.jpg',
+      imageUrl:
+          'https://images.unsplash.com/photo-1505842465776-3d0d9d66ee8f?w=600&h=400&fit=crop',
     ),
     Routine(
       title: 'Ganancia Muscular Full Body',
@@ -71,7 +77,8 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 12,
       description:
           'Rutina completa para ganar masa muscular en todo el cuerpo.',
-      imageUrl: 'assets/images/ganancia_muscular_full_body.jpg',
+      imageUrl:
+          'https://images.unsplash.com/photo-1517960413843-0aee8e2b1a8e?w=600&h=400&fit=crop',
     ),
     Routine(
       title: 'Estiramiento Diario',
@@ -81,9 +88,62 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 8,
       description:
           'Rutina de estiramiento para mantener la movilidad y prevenir lesiones.',
-      imageUrl: 'assets/images/estiramiento_diario.jpg',
+      imageUrl:
+          'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?w=600&h=400&fit=crop',
+    ),
+    Routine(
+      title: 'Entrenamiento de Piernas',
+      category: 'Fuerza',
+      duration: '50 min',
+      difficulty: 'Avanzado',
+      exercises: 10,
+      description:
+          'Rutina intensiva para piernas y glúteos con ejercicios compuestos.',
+      imageUrl:
+          'https://images.unsplash.com/photo-1434755566174-8eab9aa928d8?w=600&h=400&fit=crop',
+    ),
+    Routine(
+      title: 'Pilates Completo',
+      category: 'Flexibilidad',
+      duration: '35 min',
+      difficulty: 'Intermedio',
+      exercises: 9,
+      description:
+          'Ejercicios de pilates para fortalecer core y mejorar postura.',
+      imageUrl:
+          'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=600&h=400&fit=crop',
+    ),
+    Routine(
+      title: 'Boxeo Cardiovascular',
+      category: 'Cardio',
+      duration: '45 min',
+      difficulty: 'Avanzado',
+      exercises: 8,
+      description:
+          'Entrenamiento de boxeo para quemar calorías y mejorar coordinación.',
+      imageUrl:
+          'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?w=600&h=400&fit=crop',
+    ),
+    Routine(
+      title: 'Espalda Fuerte',
+      category: 'Fuerza',
+      duration: '40 min',
+      difficulty: 'Intermedio',
+      exercises: 9,
+      description:
+          'Rutina especializada para construir una espalda fuerte y resistente.',
+      imageUrl:
+          'https://images.unsplash.com/photo-1578762421294-b88ef7f14a0a?w=600&h=400&fit=crop',
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = _categories.contains(widget.initialCategory)
+        ? widget.initialCategory
+        : 'Todas';
+  }
 
   List<Routine> get _filteredRoutines {
     if (_selectedCategory == 'Todas') return _allRoutines;
@@ -227,6 +287,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
         ? 24.0
         : 32.0;
     final verticalPadding = isMobile ? 16.0 : 24.0;
+    final filterHeight = isMobile ? 66.0 : 72.0;
     final titleFontSize = isMobile
         ? 24.0
         : isTablet
@@ -241,7 +302,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // Header con botón de regreso
             Padding(
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding,
@@ -252,6 +313,36 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Botón de regreso
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withAlpha(8),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new,
+                            color: Color(0xFF4F46E5),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
                   Text(
                     'Mis Rutinas',
                     style: textTheme.titleLarge?.copyWith(
@@ -308,7 +399,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
 
             // Filtros horizontales
             SizedBox(
-              height: 50,
+              height: filterHeight,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.symmetric(
@@ -318,42 +409,65 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
                 itemBuilder: (context, index) {
                   final category = _categories[index];
                   final isSelected = _selectedCategory == category;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedCategory = category),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.only(right: 12),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? 16 : 20,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected ? kPrimaryIndigo : Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        border: Border.all(
-                          color: isSelected
-                              ? kPrimaryIndigo
-                              : Colors.grey[200]!,
-                          width: 1,
+                  return MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedCategory = category),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.only(right: 10),
+                        height: isMobile ? 40 : 44,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 14 : 18,
                         ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: kPrimaryIndigo.withAlpha(51),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Center(
-                        child: Text(
-                          category,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.grey[700],
-                            fontWeight: FontWeight.w600,
-                            fontSize: isMobile ? 12 : 14,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: isSelected ? kPrimaryIndigo : Colors.white,
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(
+                            color: isSelected
+                                ? kPrimaryIndigo
+                                : Colors.grey[200]!,
+                            width: 1,
                           ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: kPrimaryIndigo.withAlpha(28),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              category,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey[700],
+                                fontWeight: FontWeight.w600,
+                                fontSize: isMobile ? 12 : 13,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 2),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: isSelected ? 26 : 0,
+                              height: 3,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -414,10 +528,18 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
                       child: GridView.builder(
                         itemCount: _filteredRoutines.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: isMobile ? 2 : isTablet ? 2 : 3,
+                          crossAxisCount: isMobile
+                              ? 2
+                              : isTablet
+                              ? 2
+                              : 3,
                           mainAxisSpacing: 14,
                           crossAxisSpacing: 14,
-                          childAspectRatio: isMobile ? 0.82 : isTablet ? 0.92 : 1.0,
+                          mainAxisExtent: isMobile
+                              ? 260
+                              : isTablet
+                              ? 286
+                              : 304,
                         ),
                         itemBuilder: (context, index) {
                           final routine = _filteredRoutines[index];
@@ -951,17 +1073,21 @@ class _RoutineCard extends StatelessWidget {
         ? 80.0
         : 90.0;
     final titleFontSize = isMobile
-        ? 14.0
+        ? 13.0
         : isTablet
-        ? 16.0
-        : 18.0;
-    final descriptionFontSize = isMobile ? 12.0 : 14.0;
-    final padding = isMobile
+        ? 15.0
+        : 16.0;
+    final descriptionFontSize = isMobile
+        ? 11.0
+        : isTablet
         ? 12.0
+        : 13.0;
+    final padding = isMobile
+        ? 10.0
         : isTablet
-        ? 16.0
-        : 20.0;
-    final marginBottom = isMobile ? 12.0 : 16.0;
+        ? 14.0
+        : 16.0;
+    final marginBottom = isMobile ? 10.0 : 14.0;
 
     return Container(
       margin: EdgeInsets.only(bottom: marginBottom),
@@ -1124,12 +1250,12 @@ class _RoutineGridCard extends StatelessWidget {
               ),
               child: Image(
                 image: _buildImageProvider(routine.imageUrl),
-                height: 110,
+                height: 100,
                 width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    height: 110,
+                    height: 100,
                     width: double.infinity,
                     color: const Color(0xFFEBEEF5),
                     child: const Icon(
@@ -1141,8 +1267,9 @@ class _RoutineGridCard extends StatelessWidget {
                 },
               ),
             ),
+            const SizedBox(height: 8),
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1150,7 +1277,7 @@ class _RoutineGridCard extends StatelessWidget {
                     routine.title,
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -1160,26 +1287,31 @@ class _RoutineGridCard extends StatelessWidget {
                     routine.description,
                     style: textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
-                      fontSize: 12,
+                      fontSize: 11,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 4,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _InfoChip(
-                        icon: Icons.timer,
-                        text: routine.duration,
-                        isCompact: true,
+                      Row(
+                        children: [
+                          _InfoChip(
+                            icon: Icons.timer,
+                            text: routine.duration,
+                            isCompact: true,
+                          ),
+                          const SizedBox(width: 6),
+                          _InfoChip(
+                            icon: Icons.fitness_center,
+                            text: '${routine.exercises} ej.',
+                            isCompact: true,
+                          ),
+                        ],
                       ),
-                      _InfoChip(
-                        icon: Icons.fitness_center,
-                        text: '${routine.exercises} ejercicios',
-                        isCompact: true,
-                      ),
+                      const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
