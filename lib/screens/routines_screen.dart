@@ -33,8 +33,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 8,
       description:
           'Rutina enfocada en pecho, espalda y hombros para desarrollar fuerza superior.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1594737625785-1e3de112e1d4?w=600&h=400&fit=crop',
+      imageUrl: 'assets/images/rut.PNG',
     ),
     Routine(
       title: 'Cardio HIIT Intenso',
@@ -44,8 +43,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 6,
       description:
           'Entrenamiento de alta intensidad para quemar grasa y mejorar resistencia cardiovascular.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&h=400&fit=crop',
+      imageUrl: 'assets/images/cardio_intenso.png',
     ),
     Routine(
       title: 'Yoga para Principiantes',
@@ -55,8 +53,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 10,
       description:
           'Secuencia básica de yoga para mejorar flexibilidad y reducir estrés.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1552074282-5c317d1f223b?w=600&h=400&fit=crop',
+      imageUrl: 'assets/images/yoga.png',
     ),
     Routine(
       title: 'Pérdida de Peso Express',
@@ -66,8 +63,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 7,
       description:
           'Combinación de cardio y fuerza para maximizar la quema de calorías.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1505842465776-3d0d9d66ee8f?w=600&h=400&fit=crop',
+      imageUrl: 'assets/images/perdida_peso.png',
     ),
     Routine(
       title: 'Ganancia Muscular Full Body',
@@ -77,8 +73,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 12,
       description:
           'Rutina completa para ganar masa muscular en todo el cuerpo.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1517960413843-0aee8e2b1a8e?w=600&h=400&fit=crop',
+      imageUrl: 'assets/images/ganancia_muscular.png',
     ),
     Routine(
       title: 'Estiramiento Diario',
@@ -99,8 +94,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 10,
       description:
           'Rutina intensiva para piernas y glúteos con ejercicios compuestos.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1434755566174-8eab9aa928d8?w=600&h=400&fit=crop',
+      imageUrl: 'assets/images/entrenam_piernas.png',
     ),
     Routine(
       title: 'Pilates Completo',
@@ -121,8 +115,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 8,
       description:
           'Entrenamiento de boxeo para quemar calorías y mejorar coordinación.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?w=600&h=400&fit=crop',
+      imageUrl: 'assets/images/boxeo.png',
     ),
     Routine(
       title: 'Espalda Fuerte',
@@ -132,8 +125,7 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
       exercises: 9,
       description:
           'Rutina especializada para construir una espalda fuerte y resistente.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1578762421294-b88ef7f14a0a?w=600&h=400&fit=crop',
+      imageUrl: 'assets/images/espalda.png',
     ),
   ];
 
@@ -606,64 +598,56 @@ class Routine {
             'sets': '4',
             'reps': '8-10',
             'rest': '90s',
-            'imageUrl':
-                'https://www.cambiatufisico.com/wp-content/uploads/programa-de-entrenamiento-de-fuerza.jpg',
+            'imageUrl': 'assets/images/press_banca.png',
           },
           {
             'name': 'Dominadas',
             'sets': '3',
             'reps': '6-8',
             'rest': '120s',
-            'imageUrl':
-                'https://rlgrips.com/wp-content/uploads/2024/10/chico-dominadas.jpg',
+            'imageUrl': 'assets/images/dominadas.png',
           },
           {
             'name': 'Press militar',
             'sets': '4',
             'reps': '8-10',
             'rest': '90s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/press_militar.png',
           },
           {
             'name': 'Remo con barra',
             'sets': '3',
             'reps': '8-10',
             'rest': '90s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/remo_con_barra.png',
           },
           {
             'name': 'Elevaciones laterales',
             'sets': '3',
             'reps': '12-15',
             'rest': '60s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/elevaciones.png',
           },
           {
             'name': 'Fondos en paralelas',
             'sets': '3',
             'reps': '10-12',
             'rest': '90s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/fondos_paralelos.png',
           },
           {
             'name': 'Curl de bíceps',
             'sets': '3',
             'reps': '10-12',
             'rest': '60s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/curl_biceps.png',
           },
           {
             'name': 'Extensiones de tríceps',
             'sets': '3',
             'reps': '10-12',
             'rest': '60s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/extensiones_triceps.png',
           },
         ];
       case 'Cardio HIIT Intenso':
@@ -673,48 +657,42 @@ class Routine {
             'sets': '4',
             'reps': '30s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/burpees.png',
           },
           {
             'name': 'Mountain climbers',
             'sets': '4',
             'reps': '45s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/mountain_climbers.png',
           },
           {
             'name': 'Saltos de tijera',
             'sets': '4',
             'reps': '30s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/saltos_tijera.png',
           },
           {
             'name': 'Plank jacks',
             'sets': '4',
             'reps': '45s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/plank_jacks.png',
           },
           {
             'name': 'High knees',
             'sets': '4',
             'reps': '30s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/high_knees.png',
           },
           {
             'name': 'Push-up jacks',
             'sets': '4',
             'reps': '45s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/pushup_jacks.png',
           },
         ];
       case 'Yoga para Principiantes':
@@ -724,64 +702,56 @@ class Routine {
             'sets': '3',
             'reps': '5 rondas',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/saludo_sol.png',
           },
           {
             'name': 'Postura del árbol',
             'sets': '2',
             'reps': '30s cada lado',
             'rest': '15s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/postura_arbol.png',
           },
           {
             'name': 'Postura del perro',
             'sets': '3',
             'reps': '45s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/postura_perro.png',
           },
           {
             'name': 'Postura del niño',
             'sets': '2',
             'reps': '60s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/postura_niño.png',
           },
           {
             'name': 'Postura del guerrero I',
             'sets': '2',
             'reps': '30s cada lado',
             'rest': '15s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/postura_guerrero.png',
           },
           {
             'name': 'Postura del puente',
             'sets': '2',
             'reps': '45s',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/postura_puente.png',
           },
           {
             'name': 'Respiración profunda',
             'sets': '1',
             'reps': '2 min',
             'rest': '0s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/respiracion_profunda.png',
           },
           {
             'name': 'Relajación final',
             'sets': '1',
             'reps': '3 min',
             'rest': '0s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/relajacion_final.png',
           },
         ];
       case 'Pérdida de Peso Express':
@@ -791,56 +761,49 @@ class Routine {
             'sets': '3',
             'reps': '15',
             'rest': '45s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/sentadillas.png',
           },
           {
             'name': 'Push-ups',
             'sets': '3',
             'reps': '12',
             'rest': '60s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/push_ups.png',
           },
           {
             'name': 'Saltos de cuerda',
             'sets': '4',
             'reps': '2 min',
             'rest': '30s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/saltos_cuerda.png',
           },
           {
             'name': 'Planks',
             'sets': '3',
             'reps': '45s',
             'rest': '60s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/planks.png',
           },
           {
             'name': 'Burpees',
             'sets': '3',
             'reps': '10',
             'rest': '60s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/burpees.png',
           },
           {
             'name': 'Mountain climbers',
             'sets': '3',
             'reps': '30s',
             'rest': '45s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/mountain_climbers.png',
           },
           {
             'name': 'Russian twists',
             'sets': '3',
             'reps': '20',
             'rest': '45s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/russian_twists.png',
           },
         ];
       case 'Ganancia Muscular Full Body':
@@ -850,96 +813,84 @@ class Routine {
             'sets': '4',
             'reps': '6-8',
             'rest': '180s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/sentadillas_barra.png',
           },
           {
             'name': 'Press de banca',
             'sets': '4',
             'reps': '6-8',
             'rest': '150s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/press_banca.png',
           },
           {
             'name': 'Peso muerto',
             'sets': '3',
             'reps': '6-8',
             'rest': '180s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/peso_muerto.png',
           },
           {
             'name': 'Press militar',
             'sets': '3',
             'reps': '8-10',
             'rest': '120s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/press_militar.png',
           },
           {
             'name': 'Remo con barra',
             'sets': '3',
             'reps': '8-10',
             'rest': '120s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/remo_con_barra.png',
           },
           {
             'name': 'Flexiones',
             'sets': '3',
             'reps': '10-12',
             'rest': '90s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/push_ups.png',
           },
           {
             'name': 'Curl de bíceps',
             'sets': '3',
             'reps': '10-12',
             'rest': '90s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/curl_biceps.png',
           },
           {
             'name': 'Extensiones de tríceps',
             'sets': '3',
             'reps': '10-12',
             'rest': '90s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/extensiones_triceps.png',
           },
           {
             'name': 'Elevaciones de hombros',
             'sets': '3',
             'reps': '12-15',
             'rest': '60s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/elevaciones.png',
           },
           {
             'name': 'Abdominales',
             'sets': '3',
             'reps': '15-20',
             'rest': '60s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/abdominales.png',
           },
           {
             'name': 'Fondos de piernas',
             'sets': '3',
             'reps': '12-15',
             'rest': '90s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/fondos_piernas.png',
           },
           {
             'name': 'Pull-ups asistidas',
             'sets': '3',
             'reps': '8-10',
             'rest': '120s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/dominada.png',
           },
         ];
       case 'Estiramiento Diario':
@@ -949,64 +900,56 @@ class Routine {
             'sets': '2',
             'reps': '30s cada lado',
             'rest': '10s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/estiramiento_cuello.png',
           },
           {
             'name': 'Estiramiento de hombros',
             'sets': '2',
             'reps': '30s cada lado',
             'rest': '10s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/estiramiento_hombros.png',
           },
           {
             'name': 'Estiramiento de brazos',
             'sets': '2',
             'reps': '30s cada brazo',
             'rest': '10s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/estiramiento_brazos.png',
           },
           {
             'name': 'Estiramiento de espalda',
             'sets': '2',
             'reps': '45s',
             'rest': '15s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/saludo_sol.png',
           },
           {
             'name': 'Estiramiento de caderas',
             'sets': '2',
             'reps': '30s cada lado',
             'rest': '10s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/estiramiento_cadera.png',
           },
           {
             'name': 'Estiramiento de cuádriceps',
             'sets': '2',
             'reps': '30s cada pierna',
             'rest': '10s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/estiramiento_cuadriceps.png',
           },
           {
             'name': 'Estiramiento de isquiotibiales',
             'sets': '2',
             'reps': '30s cada pierna',
             'rest': '10s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/estiramiento_isquiotibiales.png',
           },
           {
             'name': 'Estiramiento de pantorrillas',
             'sets': '2',
             'reps': '30s cada pierna',
             'rest': '10s',
-            'imageUrl':
-                'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
+            'imageUrl': 'assets/images/estiramiento_pantorrillas.png',
           },
         ];
       default:
