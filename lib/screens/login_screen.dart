@@ -39,8 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await FirebaseAuth.instance.signInWithCredential(credential);
       if (!mounted) return;
-      navigator.pushReplacement(
+      navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const MainNavigation()),
+        (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
@@ -63,16 +64,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (result.status != LoginStatus.success || result.accessToken == null) {
         messenger.showSnackBar(
-          const SnackBar(content: Text('Inicio de sesión con Facebook cancelado.')),
+          const SnackBar(
+            content: Text('Inicio de sesión con Facebook cancelado.'),
+          ),
         );
         return;
       }
 
-      final credential = FacebookAuthProvider.credential(result.accessToken!.tokenString);
+      final credential = FacebookAuthProvider.credential(
+        result.accessToken!.tokenString,
+      );
       await FirebaseAuth.instance.signInWithCredential(credential);
       if (!mounted) return;
-      navigator.pushReplacement(
+      navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const MainNavigation()),
+        (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
@@ -89,7 +95,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!await SignInWithApple.isAvailable()) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Inicio de sesión con Apple no está disponible en este dispositivo.')),
+        const SnackBar(
+          content: Text(
+            'Inicio de sesión con Apple no está disponible en este dispositivo.',
+          ),
+        ),
       );
       return;
     }
@@ -110,8 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await FirebaseAuth.instance.signInWithCredential(oauthCredential);
       if (!mounted) return;
-      navigator.pushReplacement(
+      navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const MainNavigation()),
+        (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
@@ -151,8 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = false;
       });
-      navigator.pushReplacement(
+      navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const MainNavigation()),
+        (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -270,7 +282,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(LucideIcons.arrowRight, color: Colors.white, size: 18),
+                          Icon(
+                            LucideIcons.arrowRight,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ],
                       ),
               ),

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../widgets/gym_card.dart';
+import 'map_screen.dart';
 import 'trainer_screen.dart';
 
 class GymProfileScreen extends StatelessWidget {
@@ -82,11 +83,24 @@ class GymProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
                     children: [
                       _detailChip(Icons.star, '${gym.rating}', 'Valoración'),
-                      const SizedBox(width: 10),
                       _detailChip(Icons.location_on, gym.distance, 'Distancia'),
+                      _detailChip(
+                        LucideIcons.map,
+                        'Ver mapa',
+                        'Ubicación',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => MapScreen(gyms: [gym]),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -240,8 +254,13 @@ class GymProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _detailChip(IconData icon, String label, String title) {
-    return Container(
+  Widget _detailChip(
+    IconData icon,
+    String label,
+    String title, {
+    VoidCallback? onTap,
+  }) {
+    final chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -279,6 +298,14 @@ class GymProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    if (onTap == null) return chip;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: chip,
     );
   }
 
