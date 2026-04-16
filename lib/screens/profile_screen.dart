@@ -372,11 +372,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           backgroundColor: const Color(0xFFF3F4FF),
                           backgroundImage:
                               _profileImageUrl != null &&
-                                      _profileImageUrl!.isNotEmpty
-                                  ? NetworkImage(_profileImageUrl!)
-                                  : _profileImageBytes != null
-                                      ? MemoryImage(_profileImageBytes!) as ImageProvider
-                                      : null,
+                                  _profileImageUrl!.isNotEmpty
+                              ? NetworkImage(_profileImageUrl!)
+                              : _profileImageBytes != null
+                              ? MemoryImage(_profileImageBytes!)
+                                    as ImageProvider
+                              : null,
                           child:
                               (_profileImageUrl == null ||
                                       _profileImageUrl!.isEmpty) &&
@@ -1919,7 +1920,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                   children: [
                     Icon(Icons.paypal, color: Colors.blue),
                     SizedBox(width: 12),
-                    Text('Serás redirigido a PayPal para completar el pago'),
+                    Text('Continuar con PayPal'),
                   ],
                 ),
               ),
