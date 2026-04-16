@@ -307,7 +307,7 @@ class _TrainerScreenState extends State<TrainerScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _profileInfoTile(
-                    label: 'Certificaciones',
+                    label: 'Certificacion',
                     value: '${widget.trainer.certifications}',
                     color: primary,
                   ),

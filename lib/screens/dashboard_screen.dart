@@ -482,7 +482,7 @@ class NotificationsViewDialog extends StatelessWidget {
     final notifications = [
       {
         'title': 'Nueva rutina disponible',
-        'message': 'Descubre la rutina de fuerza avanzada',
+        'message': 'Rutina de fuerza avanzada',
         'time': 'Hace 2 horas',
       },
       {
@@ -511,21 +511,72 @@ class NotificationsViewDialog extends StatelessWidget {
           itemCount: notifications.length,
           itemBuilder: (context, index) {
             final notif = notifications[index];
-            return ListTile(
-              leading: const Icon(
-                Icons.notifications,
-                color: Color(0xFF4F46E5),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFF1F5F9)),
               ),
-              title: Text(notif['title']!),
-              subtitle: Text(notif['message']!),
-              trailing: Text(
-                notif['time']!,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              child: Stack(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEEF2FF),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.notifications,
+                          color: Color(0xFF4F46E5),
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              notif['title']!,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              notif['message']!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF64748B),
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Text(
+                      notif['time']!,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF94A3B8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              onTap: () {
-                // Acción al tocar notificación (simulada)
-                Navigator.of(context).pop();
-              },
             );
           },
         ),
