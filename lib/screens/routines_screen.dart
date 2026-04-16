@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../main_navigation.dart';
 
 // Pantalla de rutinas con diseño profesional y contenido completo
 class RoutinesScreen extends StatefulWidget {
@@ -310,7 +311,14 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.pop(context);
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const MainNavigation(initialIndex: 0),
+                            ),
+                            (route) => false,
+                          );
                         },
                         child: Container(
                           decoration: BoxDecoration(
