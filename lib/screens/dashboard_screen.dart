@@ -4,7 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'map_screen.dart';
 import 'login_screen.dart';
 import 'trainers_list_screen.dart';
-import '../widgets/gym_card.dart'; 
+import 'trainer_screen.dart';
+import 'gym_profile_screen.dart';
+import '../widgets/gym_card.dart';
 
 // Pantalla principal del dashboard con lista de gimnasios
 class DashboardScreen extends StatefulWidget {
@@ -14,7 +16,8 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
+class _DashboardScreenState extends State<DashboardScreen>
+    with TickerProviderStateMixin {
   // Estado para filtros de categorías
   String _activeFilter = "Todos";
   final List<String> _categories = [
@@ -39,13 +42,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     )..repeat(reverse: true);
 
     // Animación de pulso sutil (de 1.0 a 1.05)
-    _logoPulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(CurvedAnimation(
-      parent: _logoPulseController,
-      curve: Curves.easeInOut,
-    ));
+    _logoPulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _logoPulseController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -63,6 +62,37 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       distance: "1.2 km",
       rating: 4.8,
       imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48",
+      description:
+          "Centro completo con área de pesas libres, sala de cardio y clases funcionales en grupo.",
+      price: "Desde €35/mes",
+      schedule:
+          "Lun - Vie: 06:00 - 22:00\nSáb: 08:00 - 20:00\nDom: 09:00 - 17:00",
+      trainers: [
+        const Trainer(
+          name: 'Cristian López',
+          title: 'Entrenador personal · Fuerza',
+          rating: 4.9,
+          years: 8,
+          certifications: 4,
+          clients: '120+',
+          languages: 'ES, EN',
+          about: 'Especialista en fuerza y acondicionamiento.',
+          imageUrl:
+              'https://okdiario.com/img/vida-sana/2015/01/Chris-Hemsworth.jpg',
+        ),
+        const Trainer(
+          name: 'Lucía Márquez',
+          title: 'Entrenadora funcional',
+          rating: 4.7,
+          years: 5,
+          certifications: 3,
+          clients: '90+',
+          languages: 'ES',
+          about: 'Clases energéticas para mejorar resistencia y movilidad.',
+          imageUrl:
+              'https://okdiario.com/img/vida-sana/2015/01/Paula-Butrague%C3%B1o.jpg',
+        ),
+      ],
     ),
     Gym(
       name: "CrossFit Alpha",
@@ -71,6 +101,36 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       distance: "2.5 km",
       rating: 4.9,
       imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5",
+      description:
+          "Box de CrossFit con entrenamientos de alta intensidad y coaching personalizado.",
+      price: "Desde €40/mes",
+      schedule: "Lun - Vie: 06:30 - 21:30\nSáb: 08:00 - 18:00\nDom: Cerrado",
+      trainers: [
+        const Trainer(
+          name: 'Ángel Silva',
+          title: 'Coach CrossFit',
+          rating: 4.9,
+          years: 6,
+          certifications: 5,
+          clients: '110+',
+          languages: 'ES, EN',
+          about: 'Foco en fuerza, técnica y resultados rápidos.',
+          imageUrl:
+              'https://okdiario.com/img/vida-sana/2015/01/Henry-Cavill.jpg',
+        ),
+        const Trainer(
+          name: 'Sara Núñez',
+          title: 'Coach de movimientos olímpicos',
+          rating: 4.8,
+          years: 7,
+          certifications: 4,
+          clients: '100+',
+          languages: 'ES',
+          about: 'Especializada en levantamiento olímpico y movilidad.',
+          imageUrl:
+              'https://okdiario.com/img/vida-sana/2015/01/Paula-Butrague%C3%B1o.jpg',
+        ),
+      ],
     ),
     Gym(
       name: "Zen Yoga Studio",
@@ -79,6 +139,37 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       distance: "0.8 km",
       rating: 4.7,
       imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b",
+      description:
+          "Estudio tranquilo para clases de yoga, pilates y meditación guiada.",
+      price: "Desde €30/mes",
+      schedule:
+          "Lun - Vie: 07:00 - 20:00\nSáb: 08:00 - 16:00\nDom: 09:00 - 14:00",
+      trainers: [
+        const Trainer(
+          name: 'Marta Díaz',
+          title: 'Instructora de yoga',
+          rating: 4.8,
+          years: 9,
+          certifications: 5,
+          clients: '140+',
+          languages: 'ES',
+          about: 'Clases suaves y avanzadas para cuerpo y mente.',
+          imageUrl:
+              'https://okdiario.com/img/vida-sana/2015/01/Paula-Butrague%C3%B1o.jpg',
+        ),
+        const Trainer(
+          name: 'Daniel Rubio',
+          title: 'Profesor de pilates',
+          rating: 4.6,
+          years: 5,
+          certifications: 3,
+          clients: '70+',
+          languages: 'ES, EN',
+          about: 'Centrada en la postura, movilidades y control corporal.',
+          imageUrl:
+              'https://okdiario.com/img/vida-sana/2015/01/Chris-Hemsworth.jpg',
+        ),
+      ],
     ),
   ];
 
@@ -88,13 +179,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     final filteredGyms = _activeFilter == "Todos"
         ? _allGyms
         : _allGyms.where((g) => g.type == _activeFilter).toList();
-    
+
     // Navegar a la pantalla del mapa
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => MapScreen(gyms: filteredGyms),
-      ),
+      MaterialPageRoute(builder: (context) => MapScreen(gyms: filteredGyms)),
     );
   }
 
@@ -130,7 +219,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 children: [
                   IconButton(
                     onPressed: () => _openNotifications(context),
-                    icon: const Icon(Icons.notifications, color: Color(0xFF4F46E5)),
+                    icon: const Icon(
+                      Icons.notifications,
+                      color: Color(0xFF4F46E5),
+                    ),
                     tooltip: 'Notificaciones',
                   ),
                   const Spacer(),
@@ -140,15 +232,28 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         context: context,
                         builder: (ctx) => AlertDialog(
                           title: const Text('Cerrar sesión'),
-                          content: const Text('¿Estás seguro que deseas cerrar sesión?'),
+                          content: const Text(
+                            '¿Estás seguro que deseas cerrar sesión?',
+                          ),
                           actions: [
-                            TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
-                            TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Cerrar sesión')),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: const Text('Cerrar sesión'),
+                            ),
                           ],
                         ),
                       );
                       if (confirmed == true) {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
                       }
                     },
                     icon: const Icon(Icons.logout, color: Color(0xFF4F46E5)),
@@ -227,7 +332,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       onPressed: _openGoogleMaps,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4F46E5),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 10,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -253,14 +361,30 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   SizedBox(
                     height: 48,
                     child: ElevatedButton.icon(
-                      onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TrainersListScreen())),
-                      icon: const Icon(Icons.group, size: 18, color: Color.fromARGB(255, 255, 255, 255)),
-                      label: Text('Entrenadores', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w900, color: const Color.fromARGB(255, 255, 255, 255))),
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const TrainersListScreen(),
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.group,
+                        size: 18,
+                        color: Color.fromARGB(255, 255, 255, 255),
+                      ),
+                      label: Text(
+                        'Entrenadores',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w900,
+                          color: const Color.fromARGB(255, 255, 255, 255),
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4F46E5),
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
@@ -330,7 +454,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   return GymCard(
                     gym: filteredGyms[index],
                     onTap: () {
-                      // Acción al tocar la tarjeta (simulada, no hace nada)
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              GymProfileScreen(gym: filteredGyms[index]),
+                        ),
+                      );
                     },
                   );
                 },
@@ -351,10 +480,26 @@ class NotificationsViewDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     // Datos mock de notificaciones
     final notifications = [
-      {'title': 'Nueva rutina disponible', 'message': 'Descubre la rutina de fuerza avanzada', 'time': 'Hace 2 horas'},
-      {'title': 'Cita confirmada', 'message': 'Tu cita con el entrenador está programada para mañana', 'time': 'Hace 5 horas'},
-      {'title': 'Actualización de app', 'message': 'Nueva versión disponible con mejoras', 'time': 'Hace 1 día'},
-      {'title': 'Recordatorio', 'message': 'No olvides completar tu rutina de hoy', 'time': 'Hace 2 días'},
+      {
+        'title': 'Nueva rutina disponible',
+        'message': 'Descubre la rutina de fuerza avanzada',
+        'time': 'Hace 2 horas',
+      },
+      {
+        'title': 'Cita confirmada',
+        'message': 'Tu cita con el entrenador está programada para mañana',
+        'time': 'Hace 5 horas',
+      },
+      {
+        'title': 'Actualización de app',
+        'message': 'Nueva versión disponible con mejoras',
+        'time': 'Hace 1 día',
+      },
+      {
+        'title': 'Recordatorio',
+        'message': 'No olvides completar tu rutina de hoy',
+        'time': 'Hace 2 días',
+      },
     ];
 
     return AlertDialog(
@@ -367,10 +512,16 @@ class NotificationsViewDialog extends StatelessWidget {
           itemBuilder: (context, index) {
             final notif = notifications[index];
             return ListTile(
-              leading: const Icon(Icons.notifications, color: Color(0xFF4F46E5)),
+              leading: const Icon(
+                Icons.notifications,
+                color: Color(0xFF4F46E5),
+              ),
               title: Text(notif['title']!),
               subtitle: Text(notif['message']!),
-              trailing: Text(notif['time']!, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              trailing: Text(
+                notif['time']!,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
               onTap: () {
                 // Acción al tocar notificación (simulada)
                 Navigator.of(context).pop();

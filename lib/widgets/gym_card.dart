@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../screens/trainer_screen.dart';
 
 // Definimos un modelo sencillo para los datos del gimnasio
 class Gym {
@@ -9,6 +10,10 @@ class Gym {
   final String distance;
   final double rating;
   final String imageUrl;
+  final String description;
+  final String price;
+  final String schedule;
+  final List<Trainer> trainers;
 
   Gym({
     required this.name,
@@ -17,6 +22,10 @@ class Gym {
     required this.distance,
     required this.rating,
     required this.imageUrl,
+    required this.description,
+    required this.price,
+    required this.schedule,
+    required this.trainers,
   });
 }
 
@@ -24,11 +33,7 @@ class GymCard extends StatelessWidget {
   final Gym gym;
   final VoidCallback? onTap;
 
-  const GymCard({
-    super.key, 
-    required this.gym,
-    this.onTap,
-  });
+  const GymCard({super.key, required this.gym, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +83,10 @@ class GymCard extends StatelessWidget {
                   top: 10,
                   left: 10,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withAlpha(242),
                       borderRadius: BorderRadius.circular(12),
@@ -86,7 +94,7 @@ class GymCard extends StatelessWidget {
                         BoxShadow(
                           color: Colors.black.withAlpha(26),
                           blurRadius: 4,
-                        )
+                        ),
                       ],
                     ),
                     child: Row(
@@ -143,7 +151,11 @@ class GymCard extends StatelessWidget {
                         const SizedBox(height: 2),
                         Row(
                           children: [
-                            const Icon(LucideIcons.mapPin, size: 12, color: kSlate400),
+                            const Icon(
+                              LucideIcons.mapPin,
+                              size: 12,
+                              color: kSlate400,
+                            ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
@@ -167,7 +179,10 @@ class GymCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFEEF2FF),
                             borderRadius: BorderRadius.circular(10),
