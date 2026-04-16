@@ -108,56 +108,119 @@ class _TrainerScreenState extends State<TrainerScreen> {
           ),
         ),
       ),
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF3F4FF),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con información básica del entrenador
+            const SizedBox(height: 16),
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withAlpha(10),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Container(
-                    width: 82,
-                    height: 82,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF3F4FF),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Image.network(
-                        widget.trainer.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.person, size: 46, color: primary),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(18),
+                          topRight: Radius.circular(18),
+                        ),
+                        child: SizedBox(
+                          height: 170,
+                          width: double.infinity,
+                          child: Image.network(
+                            widget.trainer.imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                                  color: primary,
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.person,
+                                    size: 52,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                          ),
+                        ),
                       ),
-                    ),
+                      Positioned(
+                        right: 16,
+                        top: 16,
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.star,
+                            color: primary,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: -42,
+                        left: 20,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.12),
+                                blurRadius: 14,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            radius: 42,
+                            backgroundColor: const Color(0xFFF3F4FF),
+                            child: ClipOval(
+                              child: Image.network(
+                                widget.trainer.imageUrl,
+                                width: 76,
+                                height: 76,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(
+                                      Icons.person,
+                                      size: 46,
+                                      color: primary,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
+                  const SizedBox(height: 54),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           widget.trainer.name,
-                          style: textTheme.titleLarge?.copyWith(
+                          style: textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w900,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 6),
                         Text(
@@ -165,27 +228,61 @@ class _TrainerScreenState extends State<TrainerScreen> {
                           style: textTheme.bodyMedium?.copyWith(
                             color: Colors.grey[700],
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 14),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             _starRow(widget.trainer.rating),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 10),
                             Text(
-                              '${widget.trainer.rating}',
-                              style: textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '· ${widget.trainer.years} años experiencia',
+                              '${widget.trainer.rating} · ${widget.trainer.years} años',
                               style: textTheme.bodySmall?.copyWith(
-                                color: Colors.grey,
+                                color: Colors.grey[700],
                               ),
                             ),
                           ],
                         ),
+                        const SizedBox(height: 18),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                ),
+                                child: const Text('Seguir'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => _showContactDialog(context),
+                                style: OutlinedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  side: BorderSide(
+                                    color: primary.withOpacity(0.2),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                ),
+                                child: const Text('Mensaje'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -194,149 +291,201 @@ class _TrainerScreenState extends State<TrainerScreen> {
             ),
 
             const SizedBox(height: 18),
-
-            // Información rápida en chips
-            Row(
-              children: [
-                _infoChip(
-                  'Certificación',
-                  '${widget.trainer.certifications}',
-                  primary,
-                ),
-                const SizedBox(width: 8),
-                _infoChip('Clientes', widget.trainer.clients, Colors.teal),
-                const SizedBox(width: 8),
-                _infoChip('Idiomas', widget.trainer.languages, Colors.orange),
-              ],
-            ),
-
-            const SizedBox(height: 18),
-
-            // Botón para reservar cita
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _showContactDialog(context),
-                icon: const Icon(Icons.calendar_today),
-                label: const Text('Reservar'),
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            // Sección sobre el entrenador
-            Text(
-              'Sobre el entrenador',
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(widget.trainer.about, style: textTheme.bodyMedium),
-            ),
-
-            const SizedBox(height: 18),
-
-            // Programas destacados
-            Text(
-              'Programas destacados',
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _programCard(
-              'Fuerza 12 semanas',
-              'Programa progresivo para ganar fuerza y masa muscular.',
-              () => Navigator.of(context).push(
-                PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 320),
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      FadeTransition(
-                        opacity: animation,
-                        child: const RoutinesScreen(initialCategory: 'Fuerza'),
-                      ),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        final curved = CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeOut,
-                        );
-                        return SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(1, 0),
-                            end: Offset.zero,
-                          ).animate(curved),
-                          child: child,
-                        );
-                      },
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Información',
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
                 ),
               ),
             ),
-            _programCard(
-              'Acondicionamiento HIIT',
-              'Mejora cardiovascular y potencia en 8 semanas.',
-              () => Navigator.of(context).push(
-                PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 320),
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      FadeTransition(
-                        opacity: animation,
-                        child: const RoutinesScreen(initialCategory: 'Cardio'),
-                      ),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        final curved = CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeOut,
-                        );
-                        return SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(1, 0),
-                            end: Offset.zero,
-                          ).animate(curved),
-                          child: child,
-                        );
-                      },
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            // Reseñas (placeholder)
-            Text(
-              'Reseñas',
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('María: Excelente entrenador, noté mejoras en 3 meses.'),
-                  SizedBox(height: 8),
-                  Text('Juan: Muy profesional y atento a la técnica.'),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _profileInfoTile(
+                    label: 'Certificaciones',
+                    value: '${widget.trainer.certifications}',
+                    color: primary,
+                  ),
+                  _profileInfoTile(
+                    label: 'Clientes',
+                    value: widget.trainer.clients,
+                    color: Colors.teal,
+                  ),
+                  _profileInfoTile(
+                    label: 'Idiomas',
+                    value: widget.trainer.languages,
+                    color: Colors.orange,
+                  ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 36),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Sobre el entrenador',
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.trainer.about,
+                      style: textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _detailRow(
+                      icon: Icons.verified,
+                      label: 'Certificaciones',
+                      value: '${widget.trainer.certifications} títulos',
+                    ),
+                    const SizedBox(height: 12),
+                    _detailRow(
+                      icon: Icons.people,
+                      label: 'Clientes',
+                      value: widget.trainer.clients,
+                    ),
+                    const SizedBox(height: 12),
+                    _detailRow(
+                      icon: Icons.language,
+                      label: 'Idiomas',
+                      value: widget.trainer.languages,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Historias y programas',
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(left: 20),
+              child: Row(
+                children: [
+                  _programCard(
+                    'Fuerza 12 semanas',
+                    'Programa progresivo para ganar fuerza y masa muscular.',
+                    () => Navigator.of(context).push(
+                      PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 320),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            FadeTransition(
+                              opacity: animation,
+                              child: const RoutinesScreen(
+                                initialCategory: 'Fuerza',
+                              ),
+                            ),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              final curved = CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOut,
+                              );
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(1, 0),
+                                  end: Offset.zero,
+                                ).animate(curved),
+                                child: child,
+                              );
+                            },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _programCard(
+                    'Acondicionamiento HIIT',
+                    'Mejora cardiovascular y potencia en 8 semanas.',
+                    () => Navigator.of(context).push(
+                      PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 320),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            FadeTransition(
+                              opacity: animation,
+                              child: const RoutinesScreen(
+                                initialCategory: 'Cardio',
+                              ),
+                            ),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              final curved = CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOut,
+                              );
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(1, 0),
+                                  end: Offset.zero,
+                                ).animate(curved),
+                                child: child,
+                              );
+                            },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Reseñas',
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  _reviewCard(
+                    'María',
+                    'Excelente entrenador, noté mejoras en 3 meses.',
+                    5,
+                  ),
+                  const SizedBox(height: 12),
+                  _reviewCard(
+                    'Juan',
+                    'Muy profesional y atento a la técnica.',
+                    5,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -344,87 +493,194 @@ class _TrainerScreenState extends State<TrainerScreen> {
   }
 }
 
-// Función que crea una fila de estrellas (hardcoded a 5 estrellas completas)
 Widget _starRow(double value) {
-  return Row(
-    children: const [
-      Icon(Icons.star, color: Color(0xFFFFD54F), size: 16),
-      Icon(Icons.star, color: Color(0xFFFFD54F), size: 16),
-      Icon(Icons.star, color: Color(0xFFFFD54F), size: 16),
-      Icon(Icons.star, color: Color(0xFFFFD54F), size: 16),
-      Icon(Icons.star_half, color: Color(0xFFFFD54F), size: 16),
-    ],
+  final stars = List<Widget>.generate(5, (index) {
+    final threshold = index + 1;
+    if (value >= threshold) {
+      return const Icon(Icons.star, color: Color(0xFFFFD54F), size: 16);
+    }
+    if (value > index && value < threshold) {
+      return const Icon(Icons.star_half, color: Color(0xFFFFD54F), size: 16);
+    }
+    return const Icon(Icons.star_border, color: Color(0xFFFFD54F), size: 16);
+  });
+
+  return Row(children: stars);
+}
+
+Widget _profileInfoTile({
+  required String label,
+  required String value,
+  required Color color,
+}) {
+  return Expanded(
+    child: Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.w900,
+              fontSize: 16,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }
 
-// Widget que crea un chip de información con icono, etiqueta y valor
-Widget _infoChip(String label, String value, Color color) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: color.withAlpha(31),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(Icons.check, color: color, size: 16),
+Widget _detailRow({
+  required IconData icon,
+  required String label,
+  required String value,
+}) {
+  return Row(
+    children: [
+      Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEEF2FF),
+          borderRadius: BorderRadius.circular(12),
         ),
-        const SizedBox(width: 8),
-        Column(
+        child: Icon(icon, color: const Color(0xFF4F46E5), size: 18),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                color: Colors.grey,
+                fontSize: 13,
+                color: Colors.grey[700],
               ),
             ),
+            const SizedBox(height: 4),
             Text(
               value,
               style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800),
             ),
           ],
         ),
-      ],
-    ),
+      ),
+    ],
   );
 }
 
-// Widget que crea una tarjeta para un programa con título, subtítulo y botón
 Widget _programCard(String title, String subtitle, VoidCallback onPressed) {
   return Container(
-    width: double.infinity,
-    margin: const EdgeInsets.symmetric(vertical: 8),
-    padding: const EdgeInsets.all(12),
+    width: 260,
+    padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(18),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.04),
+          blurRadius: 12,
+          offset: const Offset(0, 8),
+        ),
+      ],
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          subtitle,
-          style: GoogleFonts.plusJakartaSans(color: Colors.grey[700]),
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w900,
+            fontSize: 16,
+          ),
         ),
         const SizedBox(height: 8),
+        Text(
+          subtitle,
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.grey[700],
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: TextButton(
+            onPressed: onPressed,
+            child: const Text('Ver programa'),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _reviewCard(String name, String comment, int rating) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.04),
+          blurRadius: 10,
+          offset: const Offset(0, 6),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            TextButton(onPressed: onPressed, child: const Text('Ver programa')),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: const Color(0xFFEEF2FF),
+              child: Text(
+                name.substring(0, 1),
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w900,
+                  color: const Color(0xFF4F46E5),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                _starRow(rating.toDouble()),
+              ],
+            ),
           ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          comment,
+          style: GoogleFonts.plusJakartaSans(color: Colors.grey[800]),
         ),
       ],
     ),

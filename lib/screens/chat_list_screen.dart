@@ -329,7 +329,7 @@ class StoryScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Aquí puedes mostrar una historia o contenido multimedia similar al de Instagram.',
+                'Historia con contenido multimedia.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),
